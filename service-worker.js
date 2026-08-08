@@ -8,7 +8,7 @@
  * ------------------------------------------------------------------
  */
 
-const CACHE_VERSION = "chikutate-v1";
+const CACHE_VERSION = "chikutate-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -92,12 +92,27 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  // Google Fonts等の外部リソースはネットワーク優先＋キャッシュフォールバック
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
 
-  if (isSameOrigin) {
-    // アプリシェル: キャッシュ優先（オフライン確実性重視）
+  if (!isSameOrigin) {
+    // 外部リソース: ネットワーク優先、失敗時はキャッシュ
+    event.respondWith(
+      fetch(event.request)
+        .then((res) => {
+          const resClone = res.clone();
+          caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, resClone));
+          return res;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  const isImage = /\.(png|jpg|jpeg|svg|gif|webp)$/i.test(url.pathname);
+
+  if (isImage) {
+    // 画像: 更新頻度が低いためキャッシュ優先（オフライン性・速度を重視）
     event.respondWith(
       caches.match(event.request).then((cached) => {
         return cached || fetch(event.request).then((res) => {
@@ -108,7 +123,8 @@ self.addEventListener("fetch", (event) => {
       })
     );
   } else {
-    // 外部リソース: ネットワーク優先、失敗時はキャッシュ
+    // アプリ本体（HTML/JS/CSS/JSON）: ネットワーク優先で常に最新を取得し、
+    // オフライン時のみキャッシュへフォールバックする（更新が反映されない問題を防ぐ）
     event.respondWith(
       fetch(event.request)
         .then((res) => {
