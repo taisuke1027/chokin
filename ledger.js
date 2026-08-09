@@ -1,15 +1,14 @@
 /**
- * ledger.js — 履歴画面（②対応）
- * 月ごとのBPT「増加分」（獲得）と「減少分」（デトレーニングによる減少）を
- * 差し引きした収支を表示し、選択中の増加分/減少分の内訳を円グラフで見せる。
- * 日別の記録は複数選択して、まとめて日付を変更できる。
+ * ledger.js — 履歴画面（カレンダー表示）
+ * 月間カレンダーの各日付に、その日の増加分（青）・減少分（赤）を表示する。
+ * 日付をタップすると、その日の運動記録の詳細が開き、「選択」で複数選択して
+ * まとめて日付を変更できる。
  */
 const LedgerView = {
-  state: { yearMonth: null, toggle: "income", selectMode: false, selectedIds: new Set() },
-
-  colors: { cardio: "#6E8FAE", strength: "#A9803F", endurance: "#8FA678" },
-  labels: { cardio: "心肺", strength: "筋力", endurance: "筋持久力" },
-  icons: { cardio: icon("pulse", { size: 16 }), strength: icon("dumbbell", { size: 16 }), endurance: icon("repeat", { size: 15 }) },
+  state: { yearMonth: null },
+  detailDate: null,
+  detailSelectMode: false,
+  detailSelectedIds: new Set(),
 
   currentMonthStr() {
     return todayStr().slice(0, 7);
@@ -19,14 +18,7 @@ const LedgerView = {
     if (!this.state.yearMonth) this.state.yearMonth = this.currentMonthStr();
     const agg = this.aggregateMonth(this.state.yearMonth);
     const { label, range } = this.monthLabelAndRange(this.state.yearMonth);
-
-    const activeCategories = this.state.toggle === "income" ? agg.income : agg.expense;
-    const activeTotal = this.state.toggle === "income" ? agg.incomeTotal : agg.expenseTotal;
-
-    const segments = ["cardio", "strength", "endurance"].map(k => ({
-      key: k, color: this.colors[k], value: activeCategories[k]
-    }));
-    const hasData = activeTotal > 0.5;
+    const dailyTotals = this.computeDailyTotals(this.state.yearMonth);
 
     return el(`
       <div>
@@ -52,132 +44,81 @@ const LedgerView = {
         </div>
 
         <div class="card">
-          <div class="segment-toggle" id="ioToggle">
-            <button data-t="income" class="${this.state.toggle === "income" ? "active" : ""}">増加分</button>
-            <button data-t="expense" class="${this.state.toggle === "expense" ? "active" : ""}">減少分</button>
+          ${this.renderCalendarGrid(this.state.yearMonth, dailyTotals, this.computeRecordDates(this.state.yearMonth))}
+          <div class="cal-legend">
+            <span><span class="cal-legend-dot gain"></span>増加分</span>
+            <span><span class="cal-legend-dot decay"></span>減少分</span>
+            <span><span class="cal-legend-stamp">達成</span>運動した日</span>
           </div>
-
-          ${hasData ? `
-            ${ChartUI.renderPieWithLabels(
-              segments.map(s => ({ ...s, label: this.labels[s.key] })),
-              { centerLabel: { k: this.state.toggle === "income" ? "増加分" : "減少分", v: Fmt.bpt(activeTotal) } }
-            )}
-            <div style="margin-top:6px;">
-              ${segments.map(s => this.renderCategoryRow(s, activeTotal)).join("")}
-            </div>
-          ` : `
-            <div class="empty-state">
-              <div class="icon">${this.state.toggle === "income" ? icon("leaf", { size: 26 }) : icon("smile", { size: 26 })}</div>
-              <p>${this.state.toggle === "income" ? "この月はまだ運動記録がありません。" : "この月はデトレーニングによる減少がありませんでした。"}</p>
-            </div>
-          `}
-        </div>
-
-        <div class="card">
-          <div class="flex-between">
-            <div class="section-label" style="margin:0;">日別の記録</div>
-            <button class="btn-text" id="selectModeToggleBtn" style="width:auto; padding:0; font-size:12.5px;">
-              ${this.state.selectMode ? "完了" : "選択"}
-            </button>
-          </div>
-
-          ${this.state.selectMode ? `
-            <div class="flex-between select-action-bar">
-              <span class="small-muted">${this.state.selectedIds.size}件選択中</span>
-              <button class="btn-secondary" id="bulkDateChangeBtn" style="width:auto; padding:8px 14px; font-size:12.5px;" ${this.state.selectedIds.size === 0 ? "disabled" : ""}>${icon("calendar", { size: 14 })} 日付を変更</button>
-            </div>
-          ` : ""}
-
-          <div style="margin-top:8px;">${this.renderDailyRecords(this.state.yearMonth)}</div>
         </div>
       </div>
     `);
   },
 
-  renderDailyRecords(yearMonth) {
+  renderCalendarGrid(yearMonth, dailyTotals, recordDates) {
+    const [y, m] = yearMonth.split("-").map(Number);
+    const firstWeekday = new Date(y, m - 1, 1).getDay(); // 0=日
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const todayKey = todayStr();
+    const weekdayLabels = ["日", "月", "火", "水", "木", "金", "土"];
+
+    const cells = [];
+    for (let i = 0; i < firstWeekday; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+    while (cells.length % 7 !== 0) cells.push(null);
+
+    return `
+      <div class="cal-weekdays">
+        ${weekdayLabels.map((w, i) => `<div class="cal-weekday ${i === 0 ? "sun" : ""}${i === 6 ? "sat" : ""}">${w}</div>`).join("")}
+      </div>
+      <div class="cal-grid">
+        ${cells.map(d => {
+          if (d === null) return `<div class="cal-cell empty"></div>`;
+          const dateKey = `${yearMonth}-${String(d).padStart(2, "0")}`;
+          const data = dailyTotals[dateKey];
+          const hasGain = data && data.gain > 0.5;
+          const hasDecay = !!data;
+          const hasWorkout = recordDates.has(dateKey);
+          return `
+            <button class="cal-cell ${dateKey === todayKey ? "today" : ""}" data-date="${dateKey}">
+              <div class="cal-top-row">
+                <div class="cal-day-num">${d}</div>
+                ${hasWorkout ? `<div class="cal-stamp"><span>達</span><span>成</span></div>` : ""}
+              </div>
+              <div class="cal-day-amounts">
+                ${hasGain ? `<div class="cal-gain">+${Fmt.compactBpt(data.gain)}</div>` : ""}
+                ${hasDecay ? `<div class="cal-decay">${data.decay > 0.5 ? "-" + Fmt.compactBpt(data.decay) : "0"}</div>` : ""}
+              </div>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    `;
+  },
+
+  computeRecordDates(yearMonth) {
     const seasonIds = SeasonManager.getAllSeasons(AppState.user.id).map(s => s.id);
     const records = Storage.getWorkoutRecords()
-      .filter(r => seasonIds.includes(r.seasonId) && r.date.slice(0, 7) === yearMonth)
-      .sort((a, b) => b.date.localeCompare(a.date));
+      .filter(r => seasonIds.includes(r.seasonId) && r.date.slice(0, 7) === yearMonth);
+    return new Set(records.map(r => r.date.slice(0, 10)));
+  },
 
-    if (records.length === 0) {
-      return `<div class="empty-state"><div class="icon">${icon("calendar", { size: 26 })}</div><p>この月の運動記録はまだありません。</p></div>`;
-    }
-
-    const groups = {};
-    records.forEach(r => {
-      const dateKey = r.date.slice(0, 10);
-      if (!groups[dateKey]) groups[dateKey] = [];
-      groups[dateKey].push(r);
+  computeDailyTotals(yearMonth) {
+    const seasonIds = SeasonManager.getAllSeasons(AppState.user.id).map(s => s.id);
+    const entries = Storage.getAssetHistory().filter(h => seasonIds.includes(h.seasonId) && h.date.startsWith(yearMonth));
+    const map = {};
+    entries.forEach(e => {
+      if (!map[e.date]) map[e.date] = { gain: 0, decay: 0 };
+      map[e.date].gain += (e.gainCardio || 0) + (e.gainStrength || 0) + (e.gainEndurance || 0);
+      map[e.date].decay += (e.decayCardio || 0) + (e.decayStrength || 0) + (e.decayEndurance || 0);
     });
-    const dateKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a));
-
-    return dateKeys.map(dateKey => `
-      <div class="day-group">
-        <div class="day-group-label">${this.formatDayLabel(dateKey)}</div>
-        ${groups[dateKey].map(r => this.renderRecordRow(r)).join("")}
-      </div>
-    `).join("");
+    return map;
   },
 
   formatDayLabel(dateKey) {
     const d = new Date(dateKey + "T00:00:00");
     const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
     return `${d.getMonth() + 1}月${d.getDate()}日（${weekdays[d.getDay()]}）`;
-  },
-
-  renderRecordRow(r) {
-    const def = [...EXERCISES.cardio, ...EXERCISES.strength].find(e => e.id === r.exerciseId);
-    const iconName = r.category === "cardio" ? "pulse" : "dumbbell";
-    const sub = r.category === "cardio"
-      ? `${r.duration ?? "-"}分`
-      : `${r.weight ?? "-"}kg × ${r.repetitions ?? "-"}回 × ${r.sets ?? "-"}set`;
-
-    if (this.state.selectMode) {
-      const isSelected = this.state.selectedIds.has(r.id);
-      return `
-        <button class="ledger-entry clickable" data-select-id="${r.id}">
-          <div class="le-left">
-            <div class="select-checkbox ${isSelected ? "checked" : ""}">${isSelected ? "✓" : ""}</div>
-            <div>
-              <div class="le-name">${def ? def.name : r.exerciseId}</div>
-              <div class="le-sub">${sub}</div>
-            </div>
-          </div>
-          <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
-        </button>
-      `;
-    }
-
-    return `
-      <button class="ledger-entry clickable" data-record-id="${r.id}">
-        <div class="le-left">
-          <div class="le-icon">${icon(iconName, { size: 16 })}</div>
-          <div>
-            <div class="le-name">${def ? def.name : r.exerciseId}</div>
-            <div class="le-sub">${sub}</div>
-          </div>
-        </div>
-        <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
-        <div class="le-chevron">›</div>
-      </button>
-    `;
-  },
-
-  renderCategoryRow(seg, total) {
-    const pct = total > 0 ? seg.value / total : 0;
-    return `
-      <div class="ledger-entry">
-        <div class="le-left">
-          <div class="cat-icon-circle" style="background:${seg.color}">${this.icons[seg.key]}</div>
-          <div>
-            <div class="le-name">${this.labels[seg.key]}</div>
-            <div class="le-sub">${Fmt.pct(pct)}</div>
-          </div>
-        </div>
-        <div class="le-amt" style="color:var(--ink);">${Fmt.bpt(seg.value)} BPT</div>
-      </div>
-    `;
   },
 
   monthLabelAndRange(yearMonth) {
@@ -215,8 +156,147 @@ const LedgerView = {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   },
 
-  showBulkDateChange() {
-    const count = this.state.selectedIds.size;
+  // ---- 日付詳細オーバーレイ ----
+
+  showDayDetail(dateKey) {
+    this.detailDate = dateKey;
+    this.detailSelectMode = false;
+    this.detailSelectedIds = new Set();
+    this.renderDayDetailOverlay();
+  },
+
+  getDayRecords(dateKey) {
+    const seasonIds = SeasonManager.getAllSeasons(AppState.user.id).map(s => s.id);
+    return Storage.getWorkoutRecords()
+      .filter(r => seasonIds.includes(r.seasonId) && r.date.slice(0, 10) === dateKey)
+      .sort((a, b) => b.date.localeCompare(a.date));
+  },
+
+  renderDayDetailOverlay() {
+    this.removeDayDetailOverlay();
+    const dateKey = this.detailDate;
+    const records = this.getDayRecords(dateKey);
+
+    const root = document.getElementById("overlayRoot");
+    const overlay = el(`
+      <div class="overlay" id="dayDetailOverlay">
+        <div class="result-sheet" style="text-align:left;">
+          <div class="flex-between" style="margin-bottom:4px;">
+            <div class="edit-sheet-title" style="margin:0;">${this.formatDayLabel(dateKey)}</div>
+            <button class="btn-text" id="dayDetailSelectBtn" style="width:auto; padding:0; font-size:12.5px;">
+              ${this.detailSelectMode ? "完了" : "選択"}
+            </button>
+          </div>
+
+          ${this.detailSelectMode ? `
+            <div class="flex-between select-action-bar">
+              <span class="small-muted">${this.detailSelectedIds.size}件選択中</span>
+              <button class="btn-secondary" id="dayDetailBulkDateBtn" style="width:auto; padding:8px 14px; font-size:12.5px;" ${this.detailSelectedIds.size === 0 ? "disabled" : ""}>${icon("calendar", { size: 14 })} 日付を変更</button>
+            </div>
+          ` : ""}
+
+          <div style="margin-top:10px; max-height:50vh; overflow-y:auto;">
+            ${records.length === 0
+              ? `<div class="empty-state"><div class="icon">${icon("calendar", { size: 26 })}</div><p>この日の運動記録はありません。</p></div>`
+              : records.map(r => this.renderDayDetailRow(r)).join("")}
+          </div>
+
+          <div class="edit-actions">
+            <button class="btn-secondary" id="dayDetailCloseBtn">閉じる</button>
+          </div>
+        </div>
+      </div>
+    `);
+    root.appendChild(overlay);
+
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) this.removeDayDetailOverlay(); });
+    document.getElementById("dayDetailCloseBtn").addEventListener("click", () => this.removeDayDetailOverlay());
+
+    document.getElementById("dayDetailSelectBtn").addEventListener("click", () => {
+      this.detailSelectMode = !this.detailSelectMode;
+      this.detailSelectedIds = new Set();
+      this.renderDayDetailOverlay();
+    });
+
+    const bulkBtn = document.getElementById("dayDetailBulkDateBtn");
+    if (bulkBtn) {
+      bulkBtn.addEventListener("click", () => {
+        this.showBulkDateChange(this.detailSelectedIds, () => {
+          this.detailSelectMode = false;
+          this.detailSelectedIds = new Set();
+          this.removeDayDetailOverlay();
+          Router.refresh();
+        });
+      });
+    }
+
+    if (this.detailSelectMode) {
+      overlay.querySelectorAll("[data-select-id]").forEach(rowEl => {
+        rowEl.addEventListener("click", () => {
+          const id = rowEl.dataset.selectId;
+          if (this.detailSelectedIds.has(id)) this.detailSelectedIds.delete(id);
+          else this.detailSelectedIds.add(id);
+          this.renderDayDetailOverlay();
+        });
+      });
+    } else {
+      overlay.querySelectorAll("[data-record-id]").forEach(rowEl => {
+        rowEl.addEventListener("click", () => {
+          const id = rowEl.dataset.recordId;
+          const record = records.find(r => r.id === id);
+          if (!record) return;
+          this.removeDayDetailOverlay();
+          EditRecordView.show(record);
+        });
+      });
+    }
+  },
+
+  removeDayDetailOverlay() {
+    const existing = document.getElementById("dayDetailOverlay");
+    if (existing) existing.remove();
+  },
+
+  renderDayDetailRow(r) {
+    const def = [...EXERCISES.cardio, ...EXERCISES.strength].find(e => e.id === r.exerciseId);
+    const iconName = r.category === "cardio" ? "pulse" : "dumbbell";
+    const sub = r.category === "cardio"
+      ? `${r.duration ?? "-"}分`
+      : `${r.weight ?? "-"}kg × ${r.repetitions ?? "-"}回 × ${r.sets ?? "-"}set`;
+
+    if (this.detailSelectMode) {
+      const isSelected = this.detailSelectedIds.has(r.id);
+      return `
+        <button class="ledger-entry clickable" data-select-id="${r.id}">
+          <div class="le-left">
+            <div class="select-checkbox ${isSelected ? "checked" : ""}">${isSelected ? "✓" : ""}</div>
+            <div>
+              <div class="le-name">${def ? def.name : r.exerciseId}</div>
+              <div class="le-sub">${sub}</div>
+            </div>
+          </div>
+          <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
+        </button>
+      `;
+    }
+
+    return `
+      <button class="ledger-entry clickable" data-record-id="${r.id}">
+        <div class="le-left">
+          <div class="le-icon">${icon(iconName, { size: 16 })}</div>
+          <div>
+            <div class="le-name">${def ? def.name : r.exerciseId}</div>
+            <div class="le-sub">${sub}</div>
+          </div>
+        </div>
+        <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
+        <div class="le-chevron">›</div>
+      </button>
+    `;
+  },
+
+  showBulkDateChange(selectedIds, onDone) {
+    const count = selectedIds.size;
     if (count === 0) { showToast("記録を選択してください"); return; }
 
     const root = document.getElementById("overlayRoot");
@@ -246,7 +326,7 @@ const LedgerView = {
       if (!newDate) { showToast("日付を選んでください"); return; }
 
       let successCount = 0;
-      this.state.selectedIds.forEach(id => {
+      selectedIds.forEach(id => {
         const result = BptCalculator.changeWorkoutDate(id, newDate);
         if (result) successCount += 1;
       });
@@ -255,10 +335,8 @@ const LedgerView = {
       AppState.recomputeHabitScore();
 
       overlay.remove();
-      this.state.selectMode = false;
-      this.state.selectedIds = new Set();
       showToast(`${successCount}件の記録の日付を変更しました`);
-      Router.refresh();
+      if (onDone) onDone();
     });
   },
 
@@ -274,41 +352,9 @@ const LedgerView = {
         Router.refresh();
       });
     }
-    document.getElementById("ioToggle").addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-t]");
-      if (!btn) return;
-      this.state.toggle = btn.dataset.t;
-      Router.refresh();
+
+    document.querySelectorAll(".cal-cell[data-date]").forEach(cell => {
+      cell.addEventListener("click", () => this.showDayDetail(cell.dataset.date));
     });
-
-    document.getElementById("selectModeToggleBtn").addEventListener("click", () => {
-      this.state.selectMode = !this.state.selectMode;
-      this.state.selectedIds = new Set();
-      Router.refresh();
-    });
-
-    const bulkBtn = document.getElementById("bulkDateChangeBtn");
-    if (bulkBtn) {
-      bulkBtn.addEventListener("click", () => this.showBulkDateChange());
-    }
-
-    const seasonIds = SeasonManager.getAllSeasons(AppState.user.id).map(s => s.id);
-    const records = Storage.getWorkoutRecords().filter(r => seasonIds.includes(r.seasonId) && r.date.slice(0, 7) === this.state.yearMonth);
-
-    if (this.state.selectMode) {
-      document.querySelectorAll("[data-select-id]").forEach(rowEl => {
-        rowEl.addEventListener("click", () => {
-          const id = rowEl.dataset.selectId;
-          if (this.state.selectedIds.has(id)) {
-            this.state.selectedIds.delete(id);
-          } else {
-            this.state.selectedIds.add(id);
-          }
-          Router.refresh();
-        });
-      });
-    } else {
-      bindEditableRecordRows(document, records);
-    }
   }
 };

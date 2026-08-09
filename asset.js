@@ -151,21 +151,16 @@ const AssetView = {
       { key: "strength", color: this.colors.strength, value: asset.strength },
       { key: "endurance", color: this.colors.endurance, value: asset.endurance },
     ];
-    const donutSvg = ChartUI.renderDonut(segments, { centerLabel: { k: "合計", v: Fmt.bpt(t) } });
+    const donutSvg = ChartUI.renderPieWithLabels(
+      segments.map(s => ({ ...s, label: this.labels[s.key] })),
+      { centerLabel: { k: "合計", v: Fmt.bpt(t) } }
+    );
 
     return `
       <div class="card">
         <div class="section-label">身体資産の内訳</div>
         ${donutSvg}
         ${segments.map(seg => this.renderLegendRow(seg, t)).join("")}
-      </div>
-
-      <div class="card">
-        <div class="section-label">今後の展望</div>
-        <p style="font-size:12.5px; color:var(--ink-soft); line-height:1.8; margin:0;">
-          将来的には「心肺重視」「筋力重視」「バランス型」といった目標ポートフォリオを
-          選択できるようにする予定です。現在は運動記録に応じて自動的に配分が計算されます。
-        </p>
       </div>
     `;
   },
