@@ -43,7 +43,6 @@ const CORE_ASSETS = [
   "./result.js",
   "./edit.js",
   "./asset.js",
-  "./ledger.js",
   "./seasons.js",
   "./science.js",
   "./more.js",

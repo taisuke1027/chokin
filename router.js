@@ -7,7 +7,6 @@ const Router = {
     home: HomeView,
     record: RecordView,
     asset: AssetView,
-    ledger: LedgerView,
     more: MoreView,
     seasons: SeasonsView,
     science: ScienceView,
