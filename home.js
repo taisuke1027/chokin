@@ -11,7 +11,7 @@ const HomeView = {
     const prevDay = AppState.getPrevDayTotal();
     const delta = total - prevDay;
     const deltaClass = delta > 0.5 ? "up" : delta < -0.5 ? "down" : "flat";
-    const deltaIcon = delta > 0.5 ? "▲" : delta < -0.5 ? "▼" : "―";
+    const deltaIcon = delta > 0.5 ? "▲" : delta < -0.5 ? "▼" : "";
 
     const season = AppState.season;
     const seasonGain = total - season.initialAsset;
@@ -20,6 +20,11 @@ const HomeView = {
     const habitRank = HabitCalculator.getRank(habit.score);
     const pressureLevel = Storage.getPressureLevel();
     const p = CONFIG.DECAY.PRESSURE_LEVEL;
+
+    const seasonRecords = Storage.getWorkoutRecordsBySeason(season.id);
+    const totalExerciseDays = new Set(seasonRecords.map(r => r.date.slice(0, 10))).size;
+    const daysSinceStart = Math.max(1, Fmt.daysBetween(season.startDate, todayStr()) + 1);
+    const weeklyAvgDays = totalExerciseDays / Math.max(1, daysSinceStart / 7);
 
     // 「直近14日間」は実際の暦日で区切る（記録が疎らな配列の末尾N件ではなく、
     // 資産ページの期間フィルタと同じ考え方で日付そのもので絞り込む）
@@ -41,22 +46,37 @@ const HomeView = {
 
         <div class="card balance-card" style="position:relative;">
           <button class="info-icon-btn" id="bptInfoBtn" aria-label="BPTについて" style="position:absolute; top:14px; right:14px;">ⓘ</button>
-          <div class="balance-label">${icon("wallet", { size: 15 })} 身体資産</div>
-          <div class="balance-amount"><span class="num">${Fmt.bpt(total)}</span><span class="unit">BPT</span></div>
-          <div class="balance-delta ${deltaClass}">
-            <span>${deltaIcon}</span>
-            <span class="num">${Fmt.signedBpt(delta)} BPT</span>
-            <span style="opacity:.7; font-weight:500;">前日比</span>
+
+          <div class="balance-top-row">
+            <div class="balance-main-col">
+              <div class="balance-label">${icon("wallet", { size: 15 })} 身体資産</div>
+              <div class="balance-amount"><span class="num">${Fmt.bpt(total)}</span><span class="unit">BPT</span></div>
+              <div class="balance-delta ${deltaClass}">
+                ${deltaIcon ? `<span>${deltaIcon}</span>` : ""}
+                <span class="num">${Fmt.signedBpt(delta)} BPT</span>
+                <span style="opacity:.7; font-weight:500;">前日比</span>
+              </div>
+            </div>
+            <div class="balance-side-stats">
+              <div class="side-stat">
+                <div class="side-stat-k">過去最高 ${isAtHigh ? icon("medal", { size: 12, className: "inline-accent" }) : ""}</div>
+                <div class="side-stat-v num">${Fmt.compactBpt(season.highestAsset)}</div>
+              </div>
+              <div class="side-stat">
+                <div class="side-stat-k">今シーズン積立</div>
+                <div class="side-stat-v num">${Fmt.compactBpt(seasonGain)}</div>
+              </div>
+            </div>
           </div>
 
           <div class="stat-row">
             <div class="stat-box">
-              <div class="k">過去最高 ${isAtHigh ? icon("medal", { size: 13, className: "inline-accent" }) : ""}</div>
-              <div class="v num">${Fmt.bpt(season.highestAsset)}</div>
+              <div class="k">総運動日数</div>
+              <div class="v num">${totalExerciseDays}日</div>
             </div>
             <div class="stat-box">
-              <div class="k">今シーズン積立</div>
-              <div class="v num">${Fmt.signedBpt(seasonGain)}</div>
+              <div class="k">週あたり運動日数</div>
+              <div class="v num">${weeklyAvgDays.toFixed(1)}日</div>
             </div>
           </div>
         </div>

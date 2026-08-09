@@ -100,7 +100,11 @@ const AppState = {
   },
 
   getHabitScore() {
-    return Storage.getLatestHabitScore(this.season.id) || this.recomputeHabitScore();
+    // 「保存済みの値を使い回し、更新のたびに手動でキャッシュを無効化する」方式は、
+    // 記録の追加・編集・削除・インポートなど更新経路が増えるたびに呼び忘れが
+    // 起きやすく、実際に習慣スコアが反映されない不具合の原因になっていた。
+    // 計算コストは軽いため、常に最新の記録から計算し直す。
+    return this.recomputeHabitScore();
   },
 };
 

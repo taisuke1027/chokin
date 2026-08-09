@@ -222,6 +222,38 @@ main.view {
 .balance-delta.down { color: var(--clay); background: var(--clay-soft); }
 .balance-delta.flat { color: var(--ink-soft); background: var(--paper-deep); }
 
+.balance-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+.balance-main-col { flex: 1; min-width: 0; }
+.balance-side-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+  padding-top: 26px;
+  flex-shrink: 0;
+}
+.side-stat { text-align: right; }
+.side-stat-k {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+.side-stat-v {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-top: 2px;
+}
+
 .stat-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
