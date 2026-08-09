@@ -11,7 +11,7 @@ const HomeView = {
     const prevDay = AppState.getPrevDayTotal();
     const delta = total - prevDay;
     const deltaClass = delta > 0.5 ? "up" : delta < -0.5 ? "down" : "flat";
-    const deltaIcon = delta > 0.5 ? "▲" : delta < -0.5 ? "▼" : "";
+    const deltaIcon = delta < -0.5 ? "▼" : "";
 
     const season = AppState.season;
     const seasonGain = total - season.initialAsset;
@@ -60,11 +60,11 @@ const HomeView = {
             <div class="balance-side-stats">
               <div class="side-stat">
                 <div class="side-stat-k">過去最高 ${isAtHigh ? icon("medal", { size: 12, className: "inline-accent" }) : ""}</div>
-                <div class="side-stat-v num">${Fmt.compactBpt(season.highestAsset)}</div>
+                <div class="side-stat-v num">${Fmt.bpt(season.highestAsset)}</div>
               </div>
               <div class="side-stat">
                 <div class="side-stat-k">今シーズン積立</div>
-                <div class="side-stat-v num">${Fmt.compactBpt(seasonGain)}</div>
+                <div class="side-stat-v num">${Fmt.signedBpt(seasonGain)}</div>
               </div>
             </div>
           </div>

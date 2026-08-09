@@ -56,12 +56,11 @@ const AppState = {
   },
 
   // ---- 習慣スコア ----
+  // 月曜始まりの暦週ではなく、「直近7日間」のローリングウィンドウで計算する。
+  // 例：火曜日に開いた場合、先週の火曜日〜今週の月曜日（＝昨日まで）の7日間。
+  // まだ終わっていない「今日」を含めないことで、日によって母数が変わるのを防ぐ。
   currentWeekStart(dateStr = todayStr()) {
-    const d = new Date(dateStr + "T00:00:00");
-    const day = d.getDay(); // 0=Sun
-    const diffToMonday = (day === 0 ? -6 : 1) - day;
-    d.setDate(d.getDate() + diffToMonday);
-    return todayStr(d);
+    return addDaysStr(dateStr, -7);
   },
 
   computeConsecutiveWeeks() {

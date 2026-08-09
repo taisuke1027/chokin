@@ -251,6 +251,7 @@ main.view {
   font-size: 14px;
   font-weight: 800;
   color: var(--ink);
+  white-space: nowrap;
   margin-top: 2px;
 }
 
