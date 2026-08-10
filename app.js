@@ -116,17 +116,18 @@ function addDaysStr(dateStr, n) {
 document.addEventListener("DOMContentLoaded", () => {
   const splashStart = Date.now();
 
-  // しばまるの「走るコマ送りアニメーション」を開始する
+  // しばまるの「走るコマ送りアニメーション」を開始する（mascot-run-03,04,05,06 は使用しない）
   const splashMascotEl = document.getElementById("splashMascot");
-  const RUN_FRAME_COUNT = 8;
+  const RUN_FRAMES = [1, 2, 7, 8];
   const RUN_FRAME_INTERVAL_MS = 90;
   let runFrameTimer = null;
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (splashMascotEl && !prefersReducedMotion) {
-    let frame = 1;
+    let frameIdx = 0;
     runFrameTimer = setInterval(() => {
-      frame = (frame % RUN_FRAME_COUNT) + 1;
-      splashMascotEl.src = `mascot-run-${String(frame).padStart(2, "0")}.png`;
+      frameIdx = (frameIdx + 1) % RUN_FRAMES.length;
+      const frameNum = RUN_FRAMES[frameIdx];
+      splashMascotEl.src = `mascot-run-${String(frameNum).padStart(2, "0")}.png`;
     }, RUN_FRAME_INTERVAL_MS);
   }
 

@@ -64,10 +64,6 @@ const CORE_ASSETS = [
   "./mascot-body-guts.png",
   "./mascot-run-01.png",
   "./mascot-run-02.png",
-  "./mascot-run-03.png",
-  "./mascot-run-04.png",
-  "./mascot-run-05.png",
-  "./mascot-run-06.png",
   "./mascot-run-07.png",
   "./mascot-run-08.png",
 ];

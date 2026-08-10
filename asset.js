@@ -1,9 +1,9 @@
 /**
- * asset.js — 「資産」画面
- * 資産表記 → カレンダー（旧: 履歴ページ） → 推移/内訳トグル、の統合画面。
+ * asset.js — 「運動記録」画面
+ * 月毎の収支＋カレンダー → データグラフ（推移・内訳） → 記録一覧（月選択式）
  */
 const AssetView = {
-  state: { period: "1m", yearMonth: null },
+  state: { period: "1m", yearMonth: null, listMonth: null },
   detailDate: null,
   detailSelectMode: false,
   detailSelectedIds: new Set(),
@@ -38,10 +38,12 @@ const AssetView = {
       filtered = full.filter(h => h.date >= cutoff);
     }
 
+    if (!this.state.listMonth) this.state.listMonth = this.currentMonthStr();
+    const listEntries = full.filter(h => h.date.slice(0, 7) === this.state.listMonth);
+    const { label: listLabel, range: listRange } = this.monthLabelAndRange(this.state.listMonth);
+
     return el(`
       <div>
-        <h2 style="font-family:var(--font-display); font-size:19px; margin:8px 0 16px;">資産</h2>
-
         <h2 style="font-family:var(--font-display); font-size:19px; margin:24px 0 12px;">月毎の収支</h2>
         <div class="card">
           <div class="month-nav">
@@ -89,7 +91,16 @@ const AssetView = {
 
         <h2 style="font-family:var(--font-display); font-size:19px; margin:24px 0 12px;">記録一覧</h2>
         <div class="card">
-          ${this.renderList(filtered)}
+          <div class="month-nav">
+            <button id="prevListMonthBtn">‹</button>
+            <div class="month-label">
+              <div class="y">${listLabel}</div>
+              <div class="range">${listRange}</div>
+            </div>
+            <button id="nextListMonthBtn" ${this.state.listMonth >= this.currentMonthStr() ? "disabled style=\"opacity:.3;\"" : ""}>›</button>
+          </div>
+          <hr class="hr-dash" style="margin:14px 0;" />
+          ${this.renderList(listEntries)}
         </div>
       </div>
     `);
@@ -132,34 +143,22 @@ const AssetView = {
     }).join("");
   },
 
-  renderList(filtered) {
-    if (filtered.length === 0) {
-      return `<div class="empty-state"><div class="icon">${icon("folder", { size: 26 })}</div><p>この期間のデータはまだありません。</p></div>`;
+  renderList(entries) {
+    if (entries.length === 0) {
+      return `<div class="empty-state"><div class="icon">${icon("folder", { size: 26 })}</div><p>この月のデータはまだありません。</p></div>`;
     }
-    const reversed = [...filtered].reverse();
-    let html = "";
-    let currentMonth = null;
-    reversed.forEach(h => {
-      const monthKey = h.date.slice(0, 7);
-      if (monthKey !== currentMonth) {
-        currentMonth = monthKey;
-        const [y, m] = monthKey.split("-");
-        html += `<div class="ledger-month-header">${y}年${Number(m)}月</div>`;
-      }
-      html += `
-        <div class="ledger-entry">
-          <div class="le-left">
-            <div class="le-icon">${icon("calendar", { size: 16 })}</div>
-            <div>
-              <div class="le-name">${Fmt.dateJp(h.date)}</div>
-              <div class="le-sub">心肺${Fmt.bpt(h.cardio)}・筋力${Fmt.bpt(h.strength)}・筋持久${Fmt.bpt(h.endurance)}</div>
-            </div>
+    return [...entries].reverse().map(h => `
+      <div class="ledger-entry">
+        <div class="le-left">
+          <div class="le-icon">${icon("calendar", { size: 16 })}</div>
+          <div>
+            <div class="le-name">${Fmt.dateJp(h.date)}</div>
+            <div class="le-sub">心肺${Fmt.bpt(h.cardio)}・筋力${Fmt.bpt(h.strength)}・筋持久${Fmt.bpt(h.endurance)}</div>
           </div>
-          <div class="le-amt">${Fmt.bpt(h.total)}</div>
         </div>
-      `;
-    });
-    return html;
+        <div class="le-amt">${Fmt.bpt(h.total)}</div>
+      </div>
+    `).join("");
   },
 
   // ---- 内訳（旧: ポートフォリオページ） ----
@@ -539,6 +538,19 @@ const AssetView = {
           Router.refresh();
         }
       }, { passive: true });
+    }
+
+    // 記録一覧の月選択
+    document.getElementById("prevListMonthBtn").addEventListener("click", () => {
+      this.state.listMonth = this.shiftMonth(this.state.listMonth, -1);
+      Router.refresh();
+    });
+    const nextListBtn = document.getElementById("nextListMonthBtn");
+    if (!nextListBtn.disabled) {
+      nextListBtn.addEventListener("click", () => {
+        this.state.listMonth = this.shiftMonth(this.state.listMonth, 1);
+        Router.refresh();
+      });
     }
   }
 };
