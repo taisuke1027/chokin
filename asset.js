@@ -24,9 +24,6 @@ const AssetView = {
     const asset = AppState.getAsset();
     const total = asset.cardio + asset.strength + asset.endurance;
     const season = AppState.season;
-    const sinceStart = total - season.initialAsset;
-    const prevDay = AppState.getPrevDaySnapshot();
-    const dayDelta = total - prevDay.total;
 
     if (!this.state.yearMonth) this.state.yearMonth = this.currentMonthStr();
     const agg = this.aggregateMonth(this.state.yearMonth);
@@ -44,29 +41,6 @@ const AssetView = {
     return el(`
       <div>
         <h2 style="font-family:var(--font-display); font-size:19px; margin:8px 0 16px;">資産</h2>
-
-        <div class="card recap-card">
-          <div class="balance-top-row">
-            <div class="balance-main-col">
-              <div class="section-label">合計</div>
-              <div class="recap-amount"><span class="num">${Fmt.bpt(total)}</span><span class="unit">BPT</span></div>
-            </div>
-            <div class="balance-side-stats">
-              <div class="side-stat">
-                <div class="side-stat-k">利用開始日比</div>
-                <div class="side-stat-v num" style="display:flex; align-items:center; gap:2px; justify-content:flex-end;">
-                  <span class="delta-icon ${sinceStart > 0.5 ? "up" : sinceStart < -0.5 ? "down" : "flat"}">${sinceStart > 0.5 ? "↗" : sinceStart < -0.5 ? "↘" : "―"}</span>${Fmt.signedBpt(sinceStart)}
-                </div>
-              </div>
-              <div class="side-stat">
-                <div class="side-stat-k">前日比</div>
-                <div class="side-stat-v num" style="display:flex; align-items:center; gap:2px; justify-content:flex-end;">
-                  <span class="delta-icon ${dayDelta > 0.5 ? "up" : dayDelta < -0.5 ? "down" : "flat"}">${dayDelta > 0.5 ? "↗" : dayDelta < -0.5 ? "↘" : "―"}</span>${Fmt.signedBpt(dayDelta)}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <h2 style="font-family:var(--font-display); font-size:19px; margin:24px 0 12px;">月毎の収支</h2>
         <div class="card">
@@ -124,14 +98,14 @@ const AssetView = {
   // ---- 推移（旧: 資産推移ページ） ----
 
   renderChart(filtered) {
-    const points = filtered.map(h => ({ date: h.date, values: { total: h.total, cardio: h.cardio, strength: h.strength, endurance: h.endurance } }));
-    const series = [
-      { key: "total", color: this.colors.total, label: "総資産", width: 2.5 },
-      { key: "cardio", color: this.colors.cardio, label: "心肺", width: 1.75 },
-      { key: "strength", color: this.colors.strength, label: "筋力", width: 1.75 },
-      { key: "endurance", color: this.colors.endurance, label: "筋持久力", width: 1.75 },
+    const points = filtered.map(h => ({ date: h.date, values: { cardio: h.cardio, strength: h.strength, endurance: h.endurance } }));
+    // 下から 筋持久力 → 筋力 → 心肺 の順に積み上げる
+    const layers = [
+      { key: "endurance", color: this.colors.endurance, label: "筋持久力" },
+      { key: "strength", color: this.colors.strength, label: "筋力" },
+      { key: "cardio", color: this.colors.cardio, label: "心肺" },
     ];
-    return ChartUI.renderMultiLine(points, series, { height: 190 });
+    return ChartUI.renderStackedArea(points, layers, { height: 190 });
   },
 
   renderTrendBreakdown(filtered) {
@@ -162,18 +136,30 @@ const AssetView = {
     if (filtered.length === 0) {
       return `<div class="empty-state"><div class="icon">${icon("folder", { size: 26 })}</div><p>この期間のデータはまだありません。</p></div>`;
     }
-    return [...filtered].reverse().slice(0, 30).map(h => `
-      <div class="ledger-entry">
-        <div class="le-left">
-          <div class="le-icon">${icon("calendar", { size: 16 })}</div>
-          <div>
-            <div class="le-name">${Fmt.dateJp(h.date)}</div>
-            <div class="le-sub">心肺${Fmt.bpt(h.cardio)}・筋力${Fmt.bpt(h.strength)}・筋持久${Fmt.bpt(h.endurance)}</div>
+    const reversed = [...filtered].reverse();
+    let html = "";
+    let currentMonth = null;
+    reversed.forEach(h => {
+      const monthKey = h.date.slice(0, 7);
+      if (monthKey !== currentMonth) {
+        currentMonth = monthKey;
+        const [y, m] = monthKey.split("-");
+        html += `<div class="ledger-month-header">${y}年${Number(m)}月</div>`;
+      }
+      html += `
+        <div class="ledger-entry">
+          <div class="le-left">
+            <div class="le-icon">${icon("calendar", { size: 16 })}</div>
+            <div>
+              <div class="le-name">${Fmt.dateJp(h.date)}</div>
+              <div class="le-sub">心肺${Fmt.bpt(h.cardio)}・筋力${Fmt.bpt(h.strength)}・筋持久${Fmt.bpt(h.endurance)}</div>
+            </div>
           </div>
+          <div class="le-amt">${Fmt.bpt(h.total)}</div>
         </div>
-        <div class="le-amt">${Fmt.bpt(h.total)}</div>
-      </div>
-    `).join("");
+      `;
+    });
+    return html;
   },
 
   // ---- 内訳（旧: ポートフォリオページ） ----

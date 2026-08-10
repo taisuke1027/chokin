@@ -26,24 +26,11 @@ const HomeView = {
     const daysSinceStart = Math.max(1, Fmt.daysBetween(season.startDate, todayStr()) + 1);
     const weeklyAvgDays = totalExerciseDays / Math.max(1, daysSinceStart / 7);
 
-    // 「直近14日間」は実際の暦日で区切る（記録が疎らな配列の末尾N件ではなく、
-    // 資産ページの期間フィルタと同じ考え方で日付そのもので絞り込む）
-    const chartCutoff = addDaysStr(todayStr(), -14);
-    const history = Storage.getAssetHistoryBySeason(season.id).filter(h => h.date >= chartCutoff);
-    const chartPoints = history.map(h => ({ date: h.date, values: { total: h.total } }));
-    const chartSvg = ChartUI.renderSVG(chartPoints, [{ key: "total", color: "#A9803F", showArea: true }], { height: 90 });
-
     const recentRecords = Storage.getWorkoutRecordsBySeason(season.id)
       .sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
 
     return el(`
       <div>
-        <div class="tip-banner" id="tipBanner">
-          <div class="tip-banner-badge">${icon("bulb", { size: 12 })} 豆知識</div>
-          <img src="${mascotFace.file}" alt="しばまる" class="tip-mascot-icon" />
-          <div class="tip-banner-text">${tipText}</div>
-        </div>
-
         <div class="card balance-card" style="position:relative;">
           <button class="info-icon-btn" id="bptInfoBtn" aria-label="BPTについて" style="position:absolute; top:14px; right:14px;">ⓘ</button>
 
@@ -81,6 +68,12 @@ const HomeView = {
           </div>
         </div>
 
+        <div class="tip-banner" id="tipBanner">
+          <div class="tip-banner-badge">${icon("bulb", { size: 12 })} 豆知識</div>
+          <img src="${mascotFace.file}" alt="しばまる" class="tip-mascot-icon" />
+          <div class="tip-banner-text">${tipText}</div>
+        </div>
+
         <div class="card habit-card" style="position:relative;">
           <button class="info-icon-btn" id="habitInfoBtn" aria-label="詳しい説明を見る" style="position:absolute; top:14px; right:14px;">ⓘ</button>
           <div class="habit-ring" data-val="${habit.score}" style="--pct:${habit.score}"></div>
@@ -112,11 +105,6 @@ const HomeView = {
           <p class="small-muted" style="margin-top:10px; line-height:1.7;">
             数値を上げるほど、運動をサボった期間の資産減少が大きくなります。標準（×${p.MIN.toFixed(1)}）が最も緩やかな設定です。
           </p>
-        </div>
-
-        <div class="card" style="margin-top:2px;">
-          <div class="section-label">直近14日間の資産推移</div>
-          ${chartSvg}
         </div>
 
         <div class="card" style="margin-bottom:90px;">

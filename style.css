@@ -1566,3 +1566,14 @@ table.sim-table td.negative { color: var(--clay); }
 }
 .cal-legend-dot.gain { background: #4E7EA8; }
 .cal-legend-dot.decay { background: var(--clay); }
+
+/* ---- 資産: 記録一覧の月区切り見出し ---- */
+.ledger-month-header {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--brass-deep);
+  padding: 14px 2px 6px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 2px;
+}
+.ledger-month-header:first-child { padding-top: 2px; }
