@@ -11,21 +11,28 @@ const AssetRankInfoView = {
     const overlay = el(`
       <div class="overlay">
         <div class="result-sheet" style="text-align:left;">
-          <div class="edit-sheet-title">資産称号とは</div>
+          <div class="edit-sheet-title">BPTレベルとは</div>
           <div class="edit-sheet-sub">身体資産（BPT）の合計額を、ウォーキングした場合の距離に換算した目安の称号です</div>
 
           <div class="asset-rank-badge" style="margin-top:10px; padding-top:10px;">
-            <div class="asset-rank-top">
-              <span class="asset-rank-name">${icon("medal", { size: 14 })} 現在：${rankInfo.current.name}</span>
-              <span class="asset-rank-km">ウォーキング換算 ${formatWalkKm(rankInfo.current.km)}</span>
+            <div class="asset-rank-visual" style="background-image:url('${rankInfo.current.bg}');">
+              <div class="asset-rank-content">
+                <div class="asset-rank-top">
+                  <span class="asset-rank-name">${icon("medal", { size: 14 })} 現在：${rankInfo.current.name}</span>
+                  <span class="asset-rank-km">${Fmt.bpt(total)}BPT（現在の資産）はウォーキング換算した時に${formatWalkKm(rankInfo.current.km)}（${Fmt.bpt(rankInfo.current.min)}BPT）以上の距離に当たります。${rankInfo.current.note ? `（${rankInfo.current.note}）` : ""}</span>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="rank-ladder" style="margin-top:12px;">
             ${CONFIG.ASSET_RANKS.map(r => `
-              <div class="rank-ladder-item ${r.name === rankInfo.current.name ? "current-rank" : ""}" style="color:var(--brass-deep); background:var(--brass-soft);">
-                <span>${r.name}</span>
-                <span class="rl-range">${Fmt.bpt(r.min)} BPT〜（${formatWalkKm(r.km)}）</span>
+              <div class="rank-ladder-item ${r.name === rankInfo.current.name ? "current-rank" : ""}" style="background:var(--paper-deep); color:var(--ink);">
+                <div class="rl-thumb" style="background-image:url('${r.bg}');"></div>
+                <div class="rl-text">
+                  <span>${r.name}</span>
+                  <span class="rl-range">${Fmt.bpt(r.min)} BPT〜（${formatWalkKm(r.km)}）</span>
+                </div>
               </div>
             `).join("")}
           </div>

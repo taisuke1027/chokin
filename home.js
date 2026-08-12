@@ -71,16 +71,21 @@ const HomeView = {
           </div>
 
           <div class="asset-rank-badge">
-            <div class="asset-rank-top">
-              <span class="asset-rank-name">${icon("medal", { size: 14 })} ${rankInfo.current.name}
-                <button class="info-icon-btn" id="assetRankInfoBtn" aria-label="称号の一覧を見る" style="width:18px; height:18px; font-size:11px; margin-left:2px;">ⓘ</button>
-              </span>
-              <span class="asset-rank-km">ウォーキング換算 ${formatWalkKm(rankInfo.current.km)}${rankInfo.current.note ? `（${rankInfo.current.note}）` : ""}</span>
+            <div class="balance-label" style="margin-bottom:6px;">${icon("medal", { size: 15 })} BPTレベル</div>
+            <div class="asset-rank-visual" style="background-image:url('${rankInfo.current.bg}');">
+              <div class="asset-rank-content">
+                <div class="asset-rank-top">
+                  <span class="asset-rank-name">${icon("medal", { size: 14 })} ${rankInfo.current.name}
+                    <button class="info-icon-btn" id="assetRankInfoBtn" aria-label="称号の一覧を見る" style="width:18px; height:18px; font-size:11px; margin-left:2px;">ⓘ</button>
+                  </span>
+                  <span class="asset-rank-km">${Fmt.bpt(total)}BPT（現在の資産）はウォーキング換算した時に${formatWalkKm(rankInfo.current.km)}（${Fmt.bpt(rankInfo.current.min)}BPT）以上の距離に当たります。${rankInfo.current.note ? `（${rankInfo.current.note}）` : ""}</span>
+                </div>
+                ${rankInfo.next ? `
+                  <div class="asset-rank-progress-track"><div class="asset-rank-progress-fill" style="width:${(rankInfo.progress * 100).toFixed(0)}%;"></div></div>
+                  <div class="asset-rank-next">次の「${rankInfo.next.name}」まであと ${Fmt.bpt(rankInfo.remaining)} BPT</div>
+                ` : `<div class="asset-rank-next">称号は最高位です！</div>`}
+              </div>
             </div>
-            ${rankInfo.next ? `
-              <div class="asset-rank-progress-track"><div class="asset-rank-progress-fill" style="width:${(rankInfo.progress * 100).toFixed(0)}%;"></div></div>
-              <div class="asset-rank-next">次の「${rankInfo.next.name}」まであと ${Fmt.bpt(rankInfo.remaining)} BPT</div>
-            ` : `<div class="asset-rank-next">称号は最高位です！</div>`}
           </div>
         </div>
 
