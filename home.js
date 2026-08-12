@@ -26,6 +26,9 @@ const HomeView = {
     const daysSinceStart = Math.max(1, Fmt.daysBetween(season.startDate, todayStr()) + 1);
     const weeklyAvgDays = totalExerciseDays / Math.max(1, daysSinceStart / 7);
 
+    const rankInfo = getAssetRankInfo(total);
+    const graceDays = CONFIG.DECAY.CURVE[0].toDay;
+
     const recentRecords = Storage.getWorkoutRecordsBySeason(season.id)
       .sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
 
@@ -66,6 +69,19 @@ const HomeView = {
               <div class="v num">${weeklyAvgDays.toFixed(1)}日</div>
             </div>
           </div>
+
+          <div class="asset-rank-badge">
+            <div class="asset-rank-top">
+              <span class="asset-rank-name">${icon("medal", { size: 14 })} ${rankInfo.current.name}
+                <button class="info-icon-btn" id="assetRankInfoBtn" aria-label="称号の一覧を見る" style="width:18px; height:18px; font-size:11px; margin-left:2px;">ⓘ</button>
+              </span>
+              <span class="asset-rank-km">ウォーキング換算 ${formatWalkKm(rankInfo.current.km)}${rankInfo.current.note ? `（${rankInfo.current.note}）` : ""}</span>
+            </div>
+            ${rankInfo.next ? `
+              <div class="asset-rank-progress-track"><div class="asset-rank-progress-fill" style="width:${(rankInfo.progress * 100).toFixed(0)}%;"></div></div>
+              <div class="asset-rank-next">次の「${rankInfo.next.name}」まであと ${Fmt.bpt(rankInfo.remaining)} BPT</div>
+            ` : `<div class="asset-rank-next">称号は最高位です！</div>`}
+          </div>
         </div>
 
         <div class="tip-banner" id="tipBanner">
@@ -104,6 +120,9 @@ const HomeView = {
           </div>
           <p class="small-muted" style="margin-top:10px; line-height:1.7;">
             数値を上げるほど、運動をサボった期間の資産減少が大きくなります。標準（×${p.MIN.toFixed(1)}）が最も緩やかな設定です。
+          </p>
+          <p class="small-muted" style="margin-top:6px; line-height:1.7; color:var(--brass-deep); font-weight:700;">
+            目安：${graceDays}日以内に1回運動すれば、資産は減りません。
           </p>
         </div>
 
@@ -150,6 +169,10 @@ const HomeView = {
 
     document.getElementById("bptInfoBtn").addEventListener("click", () => {
       BptInfoView.show();
+    });
+
+    document.getElementById("assetRankInfoBtn").addEventListener("click", () => {
+      AssetRankInfoView.show();
     });
 
     const slider = document.getElementById("pressureLevelSlider");

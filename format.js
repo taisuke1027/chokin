@@ -50,3 +50,27 @@ function el(html) {
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
+
+/**
+ * 資産称号（ウォーキング換算レベル）の判定。
+ * CONFIG.ASSET_RANKS は下限BPTの昇順に並んでいる前提。
+ * @returns {{current, next, progress, remaining}} progressは次の称号までの進捗(0〜1)
+ */
+function getAssetRankInfo(total) {
+  const ranks = CONFIG.ASSET_RANKS;
+  let current = ranks[0];
+  let next = null;
+  for (let i = 0; i < ranks.length; i++) {
+    if (total >= ranks[i].min) {
+      current = ranks[i];
+      next = ranks[i + 1] || null;
+    }
+  }
+  const progress = next ? Math.min(1, Math.max(0, (total - current.min) / (next.min - current.min))) : 1;
+  const remaining = next ? Math.max(0, next.min - total) : 0;
+  return { current, next, progress, remaining };
+}
+
+function formatWalkKm(km) {
+  return `約${Math.round(km).toLocaleString("ja-JP")}km`;
+}

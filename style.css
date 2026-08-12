@@ -1192,6 +1192,11 @@ svg.multiline-chart .gridline { stroke: var(--rule); stroke-width: 1; }
   font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
 }
 
 /* ---- 減少シミュレーション テーブル ---- */
@@ -1567,3 +1572,46 @@ table.sim-table td.negative { color: var(--clay); }
 .cal-legend-dot.gain { background: #4E7EA8; }
 .cal-legend-dot.decay { background: var(--clay); }
 
+
+/* ---- ホーム: 資産称号バッジ（ウォーキング換算） ---- */
+.asset-rank-badge {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--rule);
+}
+.asset-rank-top {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 7px;
+}
+.asset-rank-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.asset-rank-km {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+.asset-rank-progress-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--paper-deep);
+  overflow: hidden;
+}
+.asset-rank-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brass), var(--brass-deep));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.asset-rank-next {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--ink-soft);
+}

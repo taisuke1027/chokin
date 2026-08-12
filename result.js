@@ -75,7 +75,7 @@ const ResultView = {
           ` : ""}
 
           <div style="margin-top:22px; display:flex; flex-direction:column; gap:10px;">
-            <button class="btn-primary" id="closeResultBtn">ホームへ戻る</button>
+            <button class="btn-primary" id="closeResultBtn">運動記録を見る</button>
             <button class="btn-secondary" id="anotherResultBtn">続けて記録する</button>
           </div>
         </div>
@@ -95,7 +95,7 @@ const ResultView = {
     }
     document.getElementById("closeResultBtn").addEventListener("click", () => {
       overlay.remove();
-      Router.go("home");
+      Router.go("asset");
     });
     document.getElementById("anotherResultBtn").addEventListener("click", () => {
       overlay.remove();

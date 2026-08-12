@@ -37,6 +37,7 @@ const CORE_ASSETS = [
   "./bptInfo.js",
   "./pressureInfo.js",
   "./habitInfo.js",
+  "./assetRankInfo.js",
   "./record.js",
   "./exercisePicker.js",
   "./template.js",
