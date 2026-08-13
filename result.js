@@ -27,54 +27,56 @@ const ResultView = {
     const root = document.getElementById("overlayRoot");
     const overlay = el(`
       <div class="overlay" id="resultOverlay">
-        <div class="result-sheet">
-          <div class="praise-banner">
-            <span class="praise-star praise-star-1">${icon("star", { size: 13 })}</span>
-            <span class="praise-star praise-star-2">${icon("star", { size: 9 })}</span>
-            <span class="praise-star praise-star-3">${icon("star", { size: 11 })}</span>
-            ${praise}
-          </div>
-
-          <img src="${mascotBody.file}" alt="しばまる" class="result-mascot-body" />
-
-          <div class="complete-label">積み立て完了</div>
-          <div class="gain-amount num">${Fmt.signedBpt(totalGainBPT)} BPT</div>
-          <div class="small-muted">${isSingle ? results[0].exerciseDef.name : `${results.length}件の運動を記録しました`}</div>
-
-          ${isNewHigh ? `<div class="hanko">${icon("medal", { size: 15 })} 過去最高更新</div>` : ""}
-          ${newBestNames.length > 0 ? `<div class="hanko">${icon("star", { size: 14 })} 自己ベスト更新：${newBestNames.join("、")}</div>` : ""}
-
-          <div class="hr-dash"></div>
-
-          ${!isSingle ? `
-            <div style="text-align:left;">
-              ${results.map(r => this.row(r.exerciseDef.name, r.totalGainBPT)).join("")}
+        <div class="result-sheet has-pinned-actions">
+          <div class="result-sheet-scroll">
+            <div class="praise-banner">
+              <span class="praise-star praise-star-1">${icon("star", { size: 13 })}</span>
+              <span class="praise-star praise-star-2">${icon("star", { size: 9 })}</span>
+              <span class="praise-star praise-star-3">${icon("star", { size: 11 })}</span>
+              ${praise}
             </div>
+
+            <img src="${mascotBody.file}" alt="しばまる" class="result-mascot-body" />
+
+            <div class="complete-hanko">記録完了</div>
+            <div class="gain-amount num">${Fmt.signedBpt(totalGainBPT)} BPT</div>
+            <div class="small-muted">${isSingle ? results[0].exerciseDef.name : `${results.length}件の運動を記録しました`}</div>
+
+            ${isNewHigh ? `<div class="hanko">${icon("medal", { size: 15 })} 過去最高更新</div>` : ""}
+            ${newBestNames.length > 0 ? `<div class="hanko">${icon("star", { size: 14 })} 自己ベスト更新：${newBestNames.join("、")}</div>` : ""}
+
             <div class="hr-dash"></div>
-          ` : ""}
 
-          <div style="text-align:left;">
-            ${gain.cardio > 0.01 ? this.row("心肺", gain.cardio) : ""}
-            ${gain.strength > 0.01 ? this.row("筋力", gain.strength) : ""}
-            ${gain.endurance > 0.01 ? this.row("筋持久力", gain.endurance) : ""}
-          </div>
+            ${!isSingle ? `
+              <div style="text-align:left;">
+                ${results.map(r => this.row(r.exerciseDef.name, r.totalGainBPT)).join("")}
+              </div>
+              <div class="hr-dash"></div>
+            ` : ""}
 
-          <div class="asset-transition">
-            <span class="num">${Fmt.bpt(before)}</span>
-            <span class="arrow">→</span>
-            <span class="to num">${Fmt.bpt(newAssetTotal)}</span>
-          </div>
-
-          ${isSingle ? `
-            <button class="detail-toggle" id="toggleDetail">計算の内訳を見る ▾</button>
-            <div class="calc-detail" id="calcDetail" style="display:none;">
-              ${this.renderFormulas(results[0].details, results[0].record)}
-              <div class="hr-dash" style="margin:10px 0;"></div>
-              ${this.renderDetails(results[0].details)}
+            <div style="text-align:left;">
+              ${gain.cardio > 0.01 ? this.row("心肺", gain.cardio) : ""}
+              ${gain.strength > 0.01 ? this.row("筋力", gain.strength) : ""}
+              ${gain.endurance > 0.01 ? this.row("筋持久力", gain.endurance) : ""}
             </div>
-          ` : ""}
 
-          <div style="margin-top:22px; display:flex; flex-direction:column; gap:10px;">
+            <div class="asset-transition">
+              <span class="num">${Fmt.bpt(before)}</span>
+              <span class="arrow">→</span>
+              <span class="to num">${Fmt.bpt(newAssetTotal)}</span>
+            </div>
+
+            ${isSingle ? `
+              <button class="detail-toggle" id="toggleDetail">計算の内訳を見る ▾</button>
+              <div class="calc-detail" id="calcDetail" style="display:none;">
+                ${this.renderFormulas(results[0].details, results[0].record)}
+                <div class="hr-dash" style="margin:10px 0;"></div>
+                ${this.renderDetails(results[0].details)}
+              </div>
+            ` : ""}
+          </div>
+
+          <div class="result-sheet-actions">
             <button class="btn-primary" id="closeResultBtn">運動記録を見る</button>
             <button class="btn-secondary" id="anotherResultBtn">続けて記録する</button>
           </div>
