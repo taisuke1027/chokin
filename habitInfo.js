@@ -4,7 +4,14 @@
 const HabitInfoView = {
   show() {
     const habit = AppState.getHabitScore();
-    const w = CONFIG.HABIT.WEIGHTS;
+    const gbWeights = GameBalance.current().habitWeights;
+    const gbGoals = GameBalance.current();
+    const w = {
+      cardioAchievement: gbWeights.cardioAchievement / 100,
+      strengthAchievement: gbWeights.strengthAchievement / 100,
+      consistency: gbWeights.consistency / 100,
+      exerciseDays: gbWeights.exerciseDays / 100,
+    };
     const currentRank = HabitCalculator.getRank(habit.score);
 
     const root = document.getElementById("overlayRoot");
@@ -40,17 +47,17 @@ const HabitInfoView = {
               <tbody>
                 <tr>
                   <td class="stage-label">有酸素達成率</td>
-                  <td class="stage-label">週${CONFIG.HABIT.WEEKLY_CARDIO_MINUTES_GOAL}分が目安</td>
+                  <td class="stage-label">週${gbGoals.weeklyCardioMinutesGoal}分が目安</td>
                   <td class="num">${Math.round(w.cardioAchievement * 100)}点</td>
                 </tr>
                 <tr>
                   <td class="stage-label">筋力達成率</td>
-                  <td class="stage-label">週${CONFIG.HABIT.WEEKLY_STRENGTH_DAYS_GOAL}日が目安</td>
+                  <td class="stage-label">週${gbGoals.weeklyStrengthDaysGoal}日が目安</td>
                   <td class="num">${Math.round(w.strengthAchievement * 100)}点</td>
                 </tr>
                 <tr>
                   <td class="stage-label">継続度</td>
-                  <td class="stage-label">連続${CONFIG.HABIT.CONSISTENCY_MAX_WEEKS}週で満点</td>
+                  <td class="stage-label">連続${gbGoals.consistencyMaxWeeks}週で満点</td>
                   <td class="num">${Math.round(w.consistency * 100)}点</td>
                 </tr>
                 <tr>

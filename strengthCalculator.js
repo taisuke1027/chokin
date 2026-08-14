@@ -45,7 +45,8 @@ const StrengthCalculator = {
       repWeight = CONFIG.STRENGTH.HIGH_REP_STRENGTH_WEIGHT;
     }
 
-    const groupCoefficient = exerciseDef.groupCoefficient || 1.0;
+    const gbCoefficients = GameBalance.current().muscleGroupCoefficients;
+    const groupCoefficient = gbCoefficients[exerciseDef.id] ?? exerciseDef.groupCoefficient ?? 1.0;
 
     const volumeLoad = sets * reps; // ボリューム（セット×回数）
     const stimulus = volumeLoad * relativeIntensity * groupCoefficient * repWeight;

@@ -29,12 +29,19 @@ const HabitCalculator = {
 
     const exerciseDays = new Set(weekRecords.map(r => r.date.slice(0, 10))).size;
 
-    const cardioAchievement = Math.min(1, cardioMinutes / CONFIG.HABIT.WEEKLY_CARDIO_MINUTES_GOAL);
-    const strengthAchievement = Math.min(1, strengthDays / CONFIG.HABIT.WEEKLY_STRENGTH_DAYS_GOAL);
-    const consistency = Math.min(1, consecutiveWeeks / CONFIG.HABIT.CONSISTENCY_MAX_WEEKS);
+    const gbGoals = GameBalance.current();
+    const cardioAchievement = Math.min(1, cardioMinutes / gbGoals.weeklyCardioMinutesGoal);
+    const strengthAchievement = Math.min(1, strengthDays / gbGoals.weeklyStrengthDaysGoal);
+    const consistency = Math.min(1, consecutiveWeeks / gbGoals.consistencyMaxWeeks);
     const exerciseDaysScore = Math.min(1, exerciseDays / 7);
 
-    const w = CONFIG.HABIT.WEIGHTS;
+    const gbWeights = gbGoals.habitWeights;
+    const w = {
+      cardioAchievement: gbWeights.cardioAchievement / 100,
+      strengthAchievement: gbWeights.strengthAchievement / 100,
+      consistency: gbWeights.consistency / 100,
+      exerciseDays: gbWeights.exerciseDays / 100,
+    };
     const score =
       cardioAchievement * w.cardioAchievement +
       strengthAchievement * w.strengthAchievement +

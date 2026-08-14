@@ -32,9 +32,10 @@ const CardioCalculator = {
     const intensityFactor = mets;
 
     // [GAME BALANCE] 頻度補正: 直近7日の実施回数に応じて微増、上限あり
+    const freqBonusCap = GameBalance.current().frequencyBonusCap;
     const freqBonus = Math.min(
       recentSessionsCount * CONFIG.CARDIO.FREQUENCY_BONUS_PER_SESSION,
-      CONFIG.CARDIO.FREQUENCY_BONUS_CAP
+      freqBonusCap
     );
     const frequencyFactor = 1 + freqBonus;
 

@@ -13,9 +13,9 @@ const ScienceView = {
         </div>
 
         ${this.block("BPTとは何か", `
+          <span class="tag appdef">アプリ内定義</span>
           <p>BPT（Body Point）は、あなたの運動記録をもとにアプリが独自に算出する「身体資産」の単位です。実際のお金や、特定の医学的測定値を表すものではありません。</p>
           <p>「運動 ＝ 身体への投資」というコンセプトのもと、運動によって得られる刺激と、身体が起こす適応を、積立残高のような形で可視化することを目的としています。</p>
-          <span class="tag appdef">アプリ内定義</span>
         `)}
 
         ${this.block("3層構造の考え方", `
@@ -46,7 +46,27 @@ const ScienceView = {
             <div class="fx-line">心肺BPT = 心肺刺激量（逓減後） × 心肺単価(4.0)</div>
             <div class="fx-note">頻度補正は直近7日間の心肺運動回数に応じて最大+20%まで上乗せされます。</div>
           </div>
-          <p><span class="tag balance">ゲームバランス</span><br>刺激量をBPTへ変換する係数、頻度補正の上限は調整可能な設定値です。</p>
+
+          <p style="margin-top:12px;">強度係数（METs近似値）＝ 種目ごとの基礎値 ＋ (速度あたりの係数 × 速度) ＋ (傾斜(%) × 0.15)</p>
+          <div class="sim-table-wrap" style="max-height:none; overflow:visible;">
+            <table class="sim-table">
+              <thead>
+                <tr><th>種目</th><th>基礎値</th><th>速度1km/hあたり</th></tr>
+              </thead>
+              <tbody>
+                ${EXERCISES.cardio.map(e => `
+                  <tr>
+                    <td class="stage-label">${e.name}</td>
+                    <td class="num">${e.metsBase}</td>
+                    <td class="num">${e.metsPerKmh ? "+" + e.metsPerKmh : "—"}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+          <p class="small-muted" style="margin-top:6px; line-height:1.6;">傾斜（%）が使える種目では、傾斜1%あたり+0.15が上乗せされます。水泳・その他有酸素運動は速度・傾斜の入力がなく、基礎値のみが使われます。</p>
+
+          <p><span class="tag balance">ゲームバランス</span><br>刺激量をBPTへ変換する係数、頻度補正の上限は調整可能な設定値です（「その他」→「詳細設定（ゲームバランス）」から変更できます）。</p>
         `)}
 
         ${this.block("筋力資産の算出方法", `
@@ -59,7 +79,26 @@ const ScienceView = {
             <div class="fx-line">筋力BPT = 筋力刺激量（逓減後） × 筋力単価(25)</div>
             <div class="fx-note">相対強度は0.8〜1.3の範囲に制限し、急激な変動を抑えています。</div>
           </div>
-          <p><span class="tag balance">ゲームバランス</span><br>刺激量をBPTへ変換する係数、対象筋群ごとの係数は調整可能な設定値です。</p>
+
+          <p style="margin-top:12px;">対象筋群係数は、種目が使う筋肉の大きさ・範囲に応じて設定されています。</p>
+          <div class="sim-table-wrap" style="max-height:none; overflow:visible;">
+            <table class="sim-table">
+              <thead>
+                <tr><th>種目</th><th>対象筋群係数</th></tr>
+              </thead>
+              <tbody>
+                ${EXERCISES.strength.map(e => `
+                  <tr>
+                    <td class="stage-label">${e.name}</td>
+                    <td class="num">${e.groupCoefficient != null ? e.groupCoefficient : 1.0}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+          </div>
+          <p class="small-muted" style="margin-top:6px; line-height:1.6;">スクワットのような下半身の複合種目は係数が高め、単関節に近い種目や「その他」は低めに設定されています。</p>
+
+          <p><span class="tag balance">ゲームバランス</span><br>刺激量をBPTへ変換する係数、対象筋群ごとの係数は調整可能な設定値です（「その他」→「詳細設定（ゲームバランス）」から変更できます）。</p>
         `)}
 
         ${this.block("筋持久力資産の算出方法", `
@@ -99,7 +138,7 @@ const ScienceView = {
             <div class="fx-line">              + 継続度×20 + 運動日数率×10)</div>
             <div class="fx-note">「毎日運動しないと下がる」設計ではなく、週単位の達成度を重視しています。</div>
           </div>
-          <p><span class="tag balance">ゲームバランス</span><br>各項目の重み（35/35/20/10）や目標値は調整可能な設定値です。</p>
+          <p><span class="tag balance">ゲームバランス</span><br>各項目の重み（35/35/20/10）や目標値は調整可能な設定値です（「その他」→「詳細設定（ゲームバランス）」から変更できます）。</p>
         `)}
 
 

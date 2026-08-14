@@ -62,7 +62,8 @@ const BptCalculator = {
     const isHighRep = !!calcDetails.isHighRep;
     const enduranceResult = EnduranceCalculator.calculateFromSource(category, effectiveStimulus, isHighRep);
 
-    const unitPrice = category === "cardio" ? CONFIG.CARDIO.STIMULUS_TO_BPT : CONFIG.STRENGTH.STIMULUS_TO_BPT;
+    const gb = GameBalance.current();
+    const unitPrice = category === "cardio" ? gb.cardioStimulusToBpt : gb.strengthStimulusToBpt;
     const primaryBPT = effectiveStimulus * unitPrice;
     const enduranceBPT = enduranceResult.stimulus * unitPrice;
 

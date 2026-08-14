@@ -142,6 +142,14 @@ const Storage = {
     this._set("pressureLevel", clamped);
   },
 
+  // ---- ゲームバランス調整値（ユーザーによる上書き設定） ----
+  getGameBalanceSettings() {
+    return this._get("gameBalanceSettings", {});
+  },
+  setGameBalanceSettings(settings) {
+    this._set("gameBalanceSettings", settings);
+  },
+
   // ---- 記録結果画面のマスコット全身ポーズ（交互表示の記憶） ----
   getLastMascotBodyIndex() {
     const v = this._get("lastMascotBodyIndex", -1);

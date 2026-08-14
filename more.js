@@ -10,6 +10,7 @@ const MoreView = {
         <div class="card" style="padding:0; overflow:hidden;">
           ${this.menuItem(icon("book", { size: 20 }), "シーズン成績", "過去シーズンの記録を見る", "seasons")}
           ${this.menuItem(icon("flask", { size: 20 }), "科学的根拠・計算方法", "BPTの考え方と出典について", "science")}
+          ${this.menuItem(icon("settings", { size: 20 }), "詳細設定（ゲームバランス）", "計算式の調整可能な値を変更する", "gameBalance")}
         </div>
 
         <div class="card">

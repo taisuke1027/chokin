@@ -10,6 +10,7 @@ const Router = {
     more: MoreView,
     seasons: SeasonsView,
     science: ScienceView,
+    gameBalance: GameBalanceSettingsView,
   },
 
   init() {
