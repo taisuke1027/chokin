@@ -68,6 +68,70 @@ function closeOverlay(overlayEl) {
 }
 
 /**
+ * ページ全体を右にスワイプすると、指定した画面へ「戻る」ように振る舞う。
+ * ドラッグ中は指の動きにシートがそのまま追従し、離した時に十分右へ
+ * スワイプしていればそのまま滑り落ちるように戻り、途中で離した場合は
+ * 元の位置にスナップバックする（縦スクロールとの誤爆を避けるため、
+ * 横方向の動きが縦方向より明確に大きい場合のみスワイプとして扱う）。
+ * @param {HTMLElement} viewEl 現在表示中のビューのルート要素
+ * @param {string} backRoute 戻り先のルート名
+ */
+function bindSwipeRightToGoBack(viewEl, backRoute) {
+  let touchStartX = null;
+  let touchStartY = null;
+  let dragging = false;
+  let horizontal = null;
+
+  viewEl.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    dragging = true;
+    horizontal = null;
+    viewEl.style.transition = "none";
+  }, { passive: true });
+
+  viewEl.addEventListener("touchmove", (e) => {
+    if (!dragging || touchStartX === null) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+
+    if (horizontal === null) {
+      // 最初の動きで、横スワイプか縦スクロールかを判定する
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      horizontal = Math.abs(dx) > Math.abs(dy) * 1.2;
+    }
+    if (!horizontal) return; // 縦スクロールはそのまま通す
+
+    if (dx <= 0) {
+      viewEl.style.transform = "translateX(0px)";
+      return;
+    }
+    const damped = dx * 0.9;
+    viewEl.style.transform = `translateX(${damped}px)`;
+    e.preventDefault();
+  }, { passive: false });
+
+  viewEl.addEventListener("touchend", (e) => {
+    if (!dragging || touchStartX === null) { touchStartX = null; dragging = false; return; }
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    dragging = false;
+    touchStartX = null;
+
+    if (!horizontal) return;
+    viewEl.style.transition = "transform 0.28s cubic-bezier(.22, .61, .36, 1)";
+    if (dx > 90) {
+      // しっかり右スワイプ → そのまま滑り落ちるように戻る
+      const viewWidth = viewEl.getBoundingClientRect().width;
+      viewEl.style.transform = `translateX(${viewWidth}px)`;
+      setTimeout(() => Router.go(backRoute), 240);
+    } else {
+      // 閾値未満 → 元の位置にヌルッとスナップバックする
+      viewEl.style.transform = "translateX(0px)";
+    }
+  }, { passive: true });
+}
+
+/**
  * オーバーレイのシートが一番上までスクロールされている状態で下にスワイプすると、
  * 指の動きに追従してシートが滑らかに動き、離した時に閉じる/元に戻るを判定する。
  * （スクロール中の誤爆を防ぐため、タッチ開始時にscrollTopが最上部にあるかどうかで判定する）

@@ -31,8 +31,15 @@ const Router = {
 
     main.innerHTML = "";
     try {
-      main.appendChild(view.render(params));
+      const rendered = view.render(params);
+      main.appendChild(rendered);
       if (view.afterRender) view.afterRender(params);
+
+      // 「その他」から遷移するサブ画面は、右スワイプで「その他」に戻れるようにする
+      const swipeBackViews = { seasons: "more", science: "more", gameBalance: "more" };
+      if (swipeBackViews[viewName]) {
+        bindSwipeRightToGoBack(rendered, swipeBackViews[viewName]);
+      }
     } catch (err) {
       console.error(`View "${viewName}" failed to render:`, err);
       main.innerHTML = `
