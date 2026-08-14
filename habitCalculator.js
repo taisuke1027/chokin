@@ -45,7 +45,16 @@ const HabitCalculator = {
       score: Math.round(score * 100),
       cardioAchievement: Math.round(cardioAchievement * 100),
       strengthAchievement: Math.round(strengthAchievement * 100),
+      consistency: Math.round(consistency * 100),
+      exerciseDaysAchievement: Math.round(exerciseDaysScore * 100),
       exerciseDays,
+      consecutiveWeeks,
+      points: {
+        cardio: Math.round(cardioAchievement * w.cardioAchievement * 100),
+        strength: Math.round(strengthAchievement * w.strengthAchievement * 100),
+        consistency: Math.round(consistency * w.consistency * 100),
+        exerciseDays: Math.round(exerciseDaysScore * w.exerciseDays * 100),
+      },
     };
   },
 

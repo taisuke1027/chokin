@@ -67,9 +67,10 @@ const HabitInfoView = {
           <div style="font-size:12.5px; color:var(--ink-soft); margin-top:14px;">
             <p style="margin:0 0 8px; font-weight:700; color:var(--ink);">今週のあなたの内訳</p>
             <div class="calc-detail">
-              <div class="cd-row"><span>有酸素達成率</span><b>${habit.cardioAchievement}%</b></div>
-              <div class="cd-row"><span>筋力達成率</span><b>${habit.strengthAchievement}%</b></div>
-              <div class="cd-row"><span>今週の運動日数</span><b>${habit.exerciseDays}日</b></div>
+              <div class="cd-row"><span>有酸素達成率</span><b>${habit.cardioAchievement}%（${habit.points.cardio}点）</b></div>
+              <div class="cd-row"><span>筋力達成率</span><b>${habit.strengthAchievement}%（${habit.points.strength}点）</b></div>
+              <div class="cd-row"><span>継続度（連続${habit.consecutiveWeeks}週）</span><b>${habit.consistency}%（${habit.points.consistency}点）</b></div>
+              <div class="cd-row"><span>運動日数率（${habit.exerciseDays}日）</span><b>${habit.exerciseDaysAchievement}%（${habit.points.exerciseDays}点）</b></div>
               <div class="cd-row"><span>合計スコア</span><b>${habit.score} / 100</b></div>
             </div>
           </div>
