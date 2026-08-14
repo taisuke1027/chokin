@@ -54,7 +54,7 @@ const MoreView = {
       return;
     }
     const payload = {
-      app: "積立貯筋口座",
+      app: "積立運動口座",
       exportedAt: new Date().toISOString(),
       version: 1,
       recordCount: records.length,

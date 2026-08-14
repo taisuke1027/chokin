@@ -1,6 +1,6 @@
 {
-  "name": "積立貯筋口座",
-  "short_name": "貯筋口座",
+  "name": "積立運動口座",
+  "short_name": "積立運動口座",
   "description": "運動を身体への投資と捉え、身体資産を積み立てていくトレーニング記録アプリ",
   "start_url": "./index.html",
   "scope": "./",

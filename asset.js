@@ -100,7 +100,9 @@ const AssetView = {
             <button id="nextListMonthBtn" ${this.state.listMonth >= this.currentMonthStr() ? "disabled style=\"opacity:.3;\"" : ""}>›</button>
           </div>
           <hr class="hr-dash" style="margin:14px 0;" />
-          ${this.renderList(listEntries)}
+          <div id="listSwipeArea">
+            ${this.renderList(listEntries)}
+          </div>
         </div>
       </div>
     `);
@@ -148,7 +150,7 @@ const AssetView = {
       return `<div class="empty-state"><div class="icon">${icon("folder", { size: 26 })}</div><p>この月のデータはまだありません。</p></div>`;
     }
     return [...entries].reverse().map(h => `
-      <div class="ledger-entry">
+      <button class="ledger-entry clickable" data-list-date="${h.date.slice(0, 10)}">
         <div class="le-left">
           <div class="le-icon">${icon("calendar", { size: 16 })}</div>
           <div>
@@ -157,7 +159,8 @@ const AssetView = {
           </div>
         </div>
         <div class="le-amt">${Fmt.bpt(h.total)}</div>
-      </div>
+        <div class="le-chevron">›</div>
+      </button>
     `).join("");
   },
 
@@ -507,38 +510,12 @@ const AssetView = {
       cell.addEventListener("click", () => this.showDayDetail(cell.dataset.date));
     });
 
-    // カレンダーのスワイプで月を切り替える（左スワイプ＝翌月、右スワイプ＝前月）
-    const swipeArea = document.getElementById("calSwipeArea");
-    if (swipeArea) {
-      let touchStartX = null;
-      let touchStartY = null;
-      swipeArea.addEventListener("touchstart", (e) => {
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-      }, { passive: true });
-      swipeArea.addEventListener("touchend", (e) => {
-        if (touchStartX === null) return;
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        const dy = e.changedTouches[0].clientY - touchStartY;
-        touchStartX = null;
-        touchStartY = null;
-        // 縦方向のスクロールと誤認しないよう、横方向の移動が縦方向より
-        // 明確に大きい場合のみスワイプとして扱う
-        const SWIPE_THRESHOLD = 40;
-        if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-        if (dx < 0) {
-          // 左スワイプ → 翌月（今月より先には進めない）
-          if (this.state.yearMonth < this.currentMonthStr()) {
-            this.state.yearMonth = this.shiftMonth(this.state.yearMonth, 1);
-            Router.refresh();
-          }
-        } else {
-          // 右スワイプ → 前月
-          this.state.yearMonth = this.shiftMonth(this.state.yearMonth, -1);
-          Router.refresh();
-        }
-      }, { passive: true });
-    }
+    document.querySelectorAll(".ledger-entry[data-list-date]").forEach(row => {
+      row.addEventListener("click", () => this.showDayDetail(row.dataset.listDate));
+    });
+
+    this.bindMonthSwipe("calSwipeArea", "yearMonth");
+    this.bindMonthSwipe("listSwipeArea", "listMonth");
 
     // 記録一覧の月選択
     document.getElementById("prevListMonthBtn").addEventListener("click", () => {
@@ -552,5 +529,40 @@ const AssetView = {
         Router.refresh();
       });
     }
+  },
+
+  // 指定した要素内での左右スワイプで、指定したstateキーの年月を前後に切り替える
+  // （左スワイプ＝未来の月へ、右スワイプ＝過去の月へ。今月より先には進めない）
+  bindMonthSwipe(elementId, stateKey) {
+    const swipeArea = document.getElementById(elementId);
+    if (!swipeArea) return;
+    let touchStartX = null;
+    let touchStartY = null;
+    swipeArea.addEventListener("touchstart", (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    swipeArea.addEventListener("touchend", (e) => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      touchStartX = null;
+      touchStartY = null;
+      // 縦方向のスクロールと誤認しないよう、横方向の移動が縦方向より
+      // 明確に大きい場合のみスワイプとして扱う
+      const SWIPE_THRESHOLD = 40;
+      if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+      if (dx < 0) {
+        // 左スワイプ → 未来の月（今月より先には進めない）
+        if (this.state[stateKey] < this.currentMonthStr()) {
+          this.state[stateKey] = this.shiftMonth(this.state[stateKey], 1);
+          Router.refresh();
+        }
+      } else {
+        // 右スワイプ → 過去の月
+        this.state[stateKey] = this.shiftMonth(this.state[stateKey], -1);
+        Router.refresh();
+      }
+    }, { passive: true });
   }
 };

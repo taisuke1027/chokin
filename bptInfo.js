@@ -33,11 +33,13 @@ const BptInfoView = {
       </div>
     `);
     root.appendChild(overlay);
+    lockBodyScroll();
+    bindSwipeDownToClose(overlay.querySelector(".result-sheet"), overlay);
 
-    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
-    document.getElementById("bptInfoCloseBtn").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeOverlay(overlay); });
+    document.getElementById("bptInfoCloseBtn").addEventListener("click", () => closeOverlay(overlay));
     document.getElementById("bptInfoScienceBtn").addEventListener("click", () => {
-      overlay.remove();
+      closeOverlay(overlay);
       Router.go("science");
     });
   }

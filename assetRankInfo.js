@@ -52,8 +52,10 @@ const AssetRankInfoView = {
       </div>
     `);
     root.appendChild(overlay);
+    lockBodyScroll();
+    bindSwipeDownToClose(overlay.querySelector(".result-sheet"), overlay);
 
-    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
-    document.getElementById("assetRankInfoCloseBtn").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeOverlay(overlay); });
+    document.getElementById("assetRankInfoCloseBtn").addEventListener("click", () => closeOverlay(overlay));
   }
 };

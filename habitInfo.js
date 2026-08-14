@@ -23,7 +23,7 @@ const HabitInfoView = {
             ${CONFIG.HABIT_RANKS.slice().reverse().map(r => `
               <div class="rank-ladder-item ${r.name === currentRank.name ? "current-rank" : ""}" style="color:${r.color}; background:${r.bg};">
                 <span style="display:flex; align-items:center; gap:8px;"><img src="${r.iconFile}" alt="${r.name}" class="rank-badge-icon" />${r.name}</span>
-                <span class="rl-range">${r.min}〜${r.max}点</span>
+                <span class="rl-range">${r.min === r.max ? `${r.min}点` : `${r.min}〜${r.max}点`}</span>
               </div>
             `).join("")}
           </div>
@@ -88,8 +88,10 @@ const HabitInfoView = {
       </div>
     `);
     root.appendChild(overlay);
+    lockBodyScroll();
+    bindSwipeDownToClose(overlay.querySelector(".result-sheet"), overlay);
 
-    overlay.addEventListener("click", (e) => { if (e.target === overlay) overlay.remove(); });
-    document.getElementById("habitInfoCloseBtn").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeOverlay(overlay); });
+    document.getElementById("habitInfoCloseBtn").addEventListener("click", () => closeOverlay(overlay));
   }
 };

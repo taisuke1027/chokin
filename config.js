@@ -1,7 +1,7 @@
 /**
  * config.js
  * ------------------------------------------------------------------
- * 「積立貯筋口座」計算エンジンの設定値。
+ * 「積立運動口座」計算エンジンの設定値。
  *
  * すべての係数は 3層構造 で管理する（指示書 38章）。
  *
@@ -182,7 +182,8 @@ const CONFIG = {
     { min: 20, max: 39, name: "シルバー", iconFile: "rank-silver.png", color: "#5B6B7A", bg: "#E7EDF1" },
     { min: 40, max: 59, name: "ゴールド", iconFile: "rank-gold.png", color: "#9C7838", bg: "#F1E7D3" },
     { min: 60, max: 79, name: "プラチナ", iconFile: "rank-platinum.png", color: "#3E6E8E", bg: "#DCEAF0" },
-    { min: 80, max: 100, name: "レジェンド", iconFile: "rank-legend.png", color: "#6B3FA0", bg: "#EBE0F5" },
+    { min: 80, max: 99, name: "レジェンド", iconFile: "rank-legend.png", color: "#6B3FA0", bg: "#EBE0F5" },
+    { min: 100, max: 100, name: "ゴッド", iconFile: "rank-god.png", color: "#B08A46", bg: "#40444C" },
   ],
 
   // ============================================================

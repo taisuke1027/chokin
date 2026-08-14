@@ -71,6 +71,7 @@ const CORE_ASSETS = [
   "./rank-gold.png",
   "./rank-platinum.png",
   "./rank-legend.png",
+  "./rank-god.png",
   "./mascot-normal.png",
   "./mascot-joy.png",
   "./mascot-motivated.png",
