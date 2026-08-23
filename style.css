@@ -255,11 +255,17 @@ main.view {
   white-space: nowrap;
 }
 
+.home-delta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 .home-sub-stat-row {
   display: flex;
-  justify-content: flex-start;
-  gap: 22px;
-  margin-top: 10px;
+  flex-direction: column;
+  gap: 4px;
 }
 .home-sub-stat {
   display: flex;

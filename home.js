@@ -37,21 +37,23 @@ const HomeView = {
           <!-- 身体資産：最も重要な要素 -->
           <div class="balance-label">${icon("wallet", { size: 15 })} 身体資産</div>
           <div class="balance-amount"><span class="num">${Fmt.bpt(total)}</span><span class="unit">BPT</span></div>
-          <div class="balance-delta ${deltaClass}">
-            ${deltaIcon ? `<span>${deltaIcon}</span>` : ""}
-            <span class="num">${Fmt.signedBpt(delta)} BPT</span>
-            <span style="opacity:.7; font-weight:500;">前日比</span>
-          </div>
-
-          <!-- 過去最高・今シーズン積立：補足情報（前日比のすぐ下に左寄せ） -->
-          <div class="home-sub-stat-row">
-            <div class="home-sub-stat">
-              <span class="k">過去最高 ${isAtHigh ? icon("medal", { size: 11, className: "inline-accent" }) : ""}</span>
-              <span class="v num">${Fmt.bpt(season.highestAsset)}</span>
+          <div class="home-delta-row">
+            <div class="balance-delta ${deltaClass}">
+              ${deltaIcon ? `<span>${deltaIcon}</span>` : ""}
+              <span class="num">${Fmt.signedBpt(delta)} BPT</span>
+              <span style="opacity:.7; font-weight:500;">前日比</span>
             </div>
-            <div class="home-sub-stat">
-              <span class="k">今シーズン積立</span>
-              <span class="v num">${Fmt.signedBpt(seasonGain)}</span>
+
+            <!-- 過去最高・今シーズン積立：補足情報（前日比の右に並べる） -->
+            <div class="home-sub-stat-row">
+              <div class="home-sub-stat">
+                <span class="k">過去最高 ${isAtHigh ? icon("medal", { size: 11, className: "inline-accent" }) : ""}</span>
+                <span class="v num">${Fmt.bpt(season.highestAsset)}</span>
+              </div>
+              <div class="home-sub-stat">
+                <span class="k">今シーズン積立</span>
+                <span class="v num">${Fmt.signedBpt(seasonGain)}</span>
+              </div>
             </div>
           </div>
 
