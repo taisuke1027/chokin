@@ -115,7 +115,7 @@ const HomeView = {
           <div class="tip-banner-text">${tipText}</div>
         </div>
 
-        <div class="card" style="margin-bottom:90px;">
+        <div class="card" style="margin-bottom:100px;">
           <div class="flex-between" style="margin-bottom:8px;">
             <div class="pressure-card-title">プレッシャーレベル（減少係数）</div>
             <button class="info-icon-btn" id="pressureInfoBtn" aria-label="詳しい説明を見る">ⓘ</button>

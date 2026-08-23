@@ -115,7 +115,7 @@ button {
 
 main.view {
   flex: 1;
-  padding: 4px 20px 100px;
+  padding: 4px 20px 130px;
   animation: fadeIn 0.2s ease;
 }
 
@@ -1408,7 +1408,7 @@ table.sim-table td.negative { color: var(--clay); }
   background: var(--brass-soft);
   border-radius: var(--radius-l);
   padding: 16px 16px 10px 10px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
   margin-top: 12px;
 }
 .tip-banner-badge {
