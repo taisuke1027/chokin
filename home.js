@@ -29,44 +29,62 @@ const HomeView = {
     const rankInfo = getAssetRankInfo(total);
     const graceDays = CONFIG.DECAY.CURVE[0].toDay;
 
-    const recentRecords = Storage.getWorkoutRecordsBySeason(season.id)
-      .sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
-
     return el(`
       <div>
         <div class="card balance-card" style="position:relative;">
           <button class="info-icon-btn" id="bptInfoBtn" aria-label="BPTについて" style="position:absolute; top:14px; right:14px;">ⓘ</button>
 
-          <div class="balance-top-row">
-            <div class="balance-main-col">
-              <div class="balance-label">${icon("wallet", { size: 15 })} 身体資産</div>
-              <div class="balance-amount"><span class="num">${Fmt.bpt(total)}</span><span class="unit">BPT</span></div>
-              <div class="balance-delta ${deltaClass}">
-                ${deltaIcon ? `<span>${deltaIcon}</span>` : ""}
-                <span class="num">${Fmt.signedBpt(delta)} BPT</span>
-                <span style="opacity:.7; font-weight:500;">前日比</span>
-              </div>
+          <!-- 身体資産：最も重要な要素 -->
+          <div class="balance-label">${icon("wallet", { size: 15 })} 身体資産</div>
+          <div class="balance-amount"><span class="num">${Fmt.bpt(total)}</span><span class="unit">BPT</span></div>
+          <div class="balance-delta ${deltaClass}">
+            ${deltaIcon ? `<span>${deltaIcon}</span>` : ""}
+            <span class="num">${Fmt.signedBpt(delta)} BPT</span>
+            <span style="opacity:.7; font-weight:500;">前日比</span>
+          </div>
+
+          <!-- 過去最高・今シーズン積立：補足情報（前日比のすぐ下に左寄せ） -->
+          <div class="home-sub-stat-row">
+            <div class="home-sub-stat">
+              <span class="k">過去最高 ${isAtHigh ? icon("medal", { size: 11, className: "inline-accent" }) : ""}</span>
+              <span class="v num">${Fmt.bpt(season.highestAsset)}</span>
             </div>
-            <div class="balance-side-stats">
-              <div class="side-stat">
-                <div class="side-stat-k">過去最高 ${isAtHigh ? icon("medal", { size: 12, className: "inline-accent" }) : ""}</div>
-                <div class="side-stat-v num">${Fmt.bpt(season.highestAsset)}</div>
-              </div>
-              <div class="side-stat">
-                <div class="side-stat-k">今シーズン積立</div>
-                <div class="side-stat-v num">${Fmt.signedBpt(seasonGain)}</div>
-              </div>
+            <div class="home-sub-stat">
+              <span class="k">今シーズン積立</span>
+              <span class="v num">${Fmt.signedBpt(seasonGain)}</span>
             </div>
           </div>
 
-          <div class="stat-row">
-            <div class="stat-box">
-              <div class="k">総運動日数</div>
-              <div class="v num">${totalExerciseDays}日</div>
+          <hr class="hr-dash" style="margin:16px 0;" />
+
+          <!-- 習慣スコア：2番目に重要な要素 -->
+          <div class="balance-label" style="margin-bottom:10px;">
+            ${icon("star", { size: 14 })} 習慣スコア
+            <button class="info-icon-btn" id="habitInfoBtn" aria-label="詳しい説明を見る" style="width:18px; height:18px; font-size:11px; margin-left:2px;">ⓘ</button>
+          </div>
+          <div class="home-habit-row">
+            <div class="home-habit-main">
+              <div class="habit-ring" data-val="${habit.score}" style="--pct:${habit.score}"></div>
+              <div class="habit-text">
+                <div class="t">${habit.score} / 100</div>
+                <div class="habit-rank-badge" style="color:${habitRank.color}; background:${habitRank.bg};">
+                  <img src="${habitRank.iconFile}" alt="${habitRank.name}" class="rank-badge-icon" />
+                  ${habitRank.name}
+                </div>
+                <div class="d">有酸素${habit.cardioAchievement}%達成</div>
+                <div class="d">筋トレ${habit.strengthAchievement}%達成</div>
+                <div class="d">今週の運動日数${habit.exerciseDays}日</div>
+              </div>
             </div>
-            <div class="stat-box">
-              <div class="k">週あたり運動日数</div>
-              <div class="v num">${weeklyAvgDays.toFixed(1)}日</div>
+            <div class="home-habit-side-stats">
+              <div class="side-stat-mini">
+                <div class="k">総運動日数</div>
+                <div class="v num">${totalExerciseDays}日</div>
+              </div>
+              <div class="side-stat-mini">
+                <div class="k">週あたり運動日数</div>
+                <div class="v num">${weeklyAvgDays.toFixed(1)}日</div>
+              </div>
             </div>
           </div>
 
@@ -95,20 +113,7 @@ const HomeView = {
           <div class="tip-banner-text">${tipText}</div>
         </div>
 
-        <div class="card habit-card" style="position:relative;">
-          <button class="info-icon-btn" id="habitInfoBtn" aria-label="詳しい説明を見る" style="position:absolute; top:14px; right:14px;">ⓘ</button>
-          <div class="habit-ring" data-val="${habit.score}" style="--pct:${habit.score}"></div>
-          <div class="habit-text">
-            <div class="t">習慣スコア ${habit.score} / 100</div>
-            <div class="habit-rank-badge" style="color:${habitRank.color}; background:${habitRank.bg};">
-              <img src="${habitRank.iconFile}" alt="${habitRank.name}" class="rank-badge-icon" />
-              ${habitRank.name}
-            </div>
-            <div class="d">有酸素 ${habit.cardioAchievement}%・筋トレ ${habit.strengthAchievement}%達成<br>今週の運動日数：${habit.exerciseDays}日</div>
-          </div>
-        </div>
-
-        <div class="card">
+        <div class="card" style="margin-bottom:90px;">
           <div class="flex-between" style="margin-bottom:8px;">
             <div class="pressure-card-title">プレッシャーレベル（減少係数）</div>
             <button class="info-icon-btn" id="pressureInfoBtn" aria-label="詳しい説明を見る">ⓘ</button>
@@ -131,42 +136,9 @@ const HomeView = {
           </p>
         </div>
 
-        <div class="card" style="margin-bottom:90px;">
-          <div class="flex-between">
-            <div class="section-label" style="margin:0;">最近の記録</div>
-          </div>
-          ${recentRecords.length === 0 ? `
-            <div class="empty-state">
-              <div class="icon">${icon("leaf", { size: 26 })}</div>
-              <p>まだ記録がありません。<br>最初の積立を始めましょう。</p>
-            </div>
-          ` : recentRecords.map(r => this.renderLedgerEntry(r)).join("")}
-        </div>
-
         <button class="btn-primary record-cta-fixed" id="recordCta">＋ 運動を記録する</button>
       </div>
     `);
-  },
-
-  renderLedgerEntry(r) {
-    const def = findExerciseDef(r.exerciseId);
-    const iconName = r.category === "cardio" ? "pulse" : "dumbbell";
-    const sub = r.category === "cardio"
-      ? `${r.duration ?? "-"}分`
-      : `${r.weight ?? "-"}kg × ${r.repetitions ?? "-"}回 × ${r.sets ?? "-"}set`;
-    return `
-      <button class="ledger-entry clickable" data-record-id="${r.id}">
-        <div class="le-left">
-          <div class="le-icon">${icon(iconName, { size: 16 })}</div>
-          <div>
-            <div class="le-name">${def ? def.name : r.exerciseId}</div>
-            <div class="le-sub">${Fmt.dateJp(r.date)}・${sub}</div>
-          </div>
-        </div>
-        <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
-        <div class="le-chevron">›</div>
-      </button>
-    `;
   },
 
   afterRender() {
@@ -197,13 +169,6 @@ const HomeView = {
     document.getElementById("habitInfoBtn").addEventListener("click", () => {
       HabitInfoView.show();
     });
-
-    const recentRecords = Storage.getWorkoutRecordsBySeason(AppState.season.id)
-      .sort((a, b) => b.date.localeCompare(a.date)).slice(0, 4);
-    bindEditableRecordRows(document, recentRecords);
   }
 };
 
-function findExerciseDef(exerciseId) {
-  return [...EXERCISES.cardio, ...EXERCISES.strength].find(e => e.id === exerciseId);
-}
