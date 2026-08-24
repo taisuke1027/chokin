@@ -179,7 +179,7 @@ main.view {
 }
 
 /* ---- ホーム：資産表示 ---- */
-.balance-card { text-align: left; }
+.balance-card { text-align: left; padding: 15px 18px; }
 
 .balance-label {
   font-size: 12px;
@@ -192,9 +192,9 @@ main.view {
 
 .balance-amount {
   font-weight: 800;
-  font-size: 36px;
+  font-size: 31px;
   line-height: 1.2;
-  margin: 6px 0 2px;
+  margin: 4px 0 2px;
   color: var(--ink);
   display: flex;
   align-items: baseline;
@@ -313,8 +313,8 @@ main.view {
 /* ---- 習慣スコア ---- */
 .habit-ring {
   --pct: 0;
-  width: 56px;
-  height: 56px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: conic-gradient(var(--brass) calc(var(--pct) * 1%), var(--paper-deep) 0);
   display: flex;
@@ -325,8 +325,8 @@ main.view {
 
 .habit-ring::after {
   content: attr(data-val);
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--surface);
   display: flex;
@@ -337,7 +337,7 @@ main.view {
 }
 
 .habit-text .t { font-weight: 700; font-size: 14px; }
-.habit-text .d { font-size: 10px; color: var(--ink-soft); margin-top: 2px; line-height: 1.5; }
+.habit-text .d { font-size: 10px; color: var(--ink-soft); margin-top: 1px; line-height: 1.4; }
 
 /* ---- CTAボタン ---- */
 .btn-primary {
@@ -1332,7 +1332,7 @@ table.sim-table td.negative { color: var(--clay); }
   font-weight: 700;
   padding: 3px 10px 3px 5px;
   border-radius: 20px;
-  margin: 4px 0 6px;
+  margin: 3px 0 4px;
 }
 .rank-badge-icon {
   width: 18px;
@@ -1408,8 +1408,8 @@ table.sim-table td.negative { color: var(--clay); }
   background: var(--brass-soft);
   border-radius: var(--radius-l);
   padding: 16px 16px 10px 10px;
-  margin-bottom: 20px;
-  margin-top: 12px;
+  margin-bottom: 16px;
+  margin-top: 10px;
 }
 .tip-banner-badge {
   position: absolute;
@@ -1693,7 +1693,7 @@ table.sim-table td.negative { color: var(--clay); }
   background-color: var(--paper-deep);
   background-size: cover;
   background-position: center;
-  min-height: 140px;
+  min-height: 105px;
   display: flex;
   align-items: center;
 }
@@ -1702,7 +1702,7 @@ table.sim-table td.negative { color: var(--clay); }
   z-index: 1;
   width: 100%;
   background: rgba(247, 247, 245, 0.05);
-  padding: 16px 18px;
+  padding: 10px 14px;
 }
 .asset-rank-top {
   display: flex;

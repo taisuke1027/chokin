@@ -57,10 +57,10 @@ const HomeView = {
             </div>
           </div>
 
-          <hr class="hr-dash" style="margin:16px 0;" />
+          <hr class="hr-dash" style="margin:10px 0;" />
 
           <!-- 習慣スコア：2番目に重要な要素 -->
-          <div class="balance-label" style="margin-bottom:10px;">
+          <div class="balance-label" style="margin-bottom:6px;">
             ${icon("star", { size: 14 })} 習慣スコア
             <button class="info-icon-btn" id="habitInfoBtn" aria-label="詳しい説明を見る" style="width:18px; height:18px; font-size:11px; margin-left:2px;">ⓘ</button>
           </div>
