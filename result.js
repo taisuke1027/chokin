@@ -40,13 +40,15 @@ const ResultView = {
 
             <img src="${mascotBody.file}" alt="しばまる" class="result-mascot-body" />
 
-            <div class="complete-hanko">記録完了</div>
+            <div class="complete-hanko${achievements && achievements.daysMilestone ? " complete-hanko-milestone" : ""}">
+              記録完了
+              ${achievements && achievements.daysMilestone ? `<span class="complete-hanko-sub">総運動日数${achievements.daysMilestone.days}日達成！</span>` : ""}
+            </div>
             <div class="gain-amount num">${Fmt.signedBpt(totalGainBPT)} BPT</div>
             <div class="small-muted">${isSingle ? results[0].exerciseDef.name : `${results.length}件の運動を記録しました`}</div>
 
             ${isNewHigh ? `<div class="hanko">${icon("medal", { size: 15 })} 過去最高更新</div>` : ""}
             ${newBestNames.length > 0 ? `<div class="hanko">${icon("star", { size: 14 })} 自己ベスト更新：${newBestNames.join("、")}</div>` : ""}
-            ${achievements && achievements.daysMilestone ? `<div class="hanko days-milestone-hanko">${icon("calendar", { size: 14 })} 総運動日${achievements.daysMilestone.days}日達成</div>` : ""}
 
             <div class="hr-dash"></div>
 
