@@ -1,27 +1,19 @@
 /**
- * levelUpView.js — 運動記録後、「習慣スコア」「BPTレベル」「総運動日数（10日間隔）」の
- * いずれかが更新されていた場合に表示する、レベルアップ／記録更新の演出オーバーレイ。
+ * levelUpView.js — 運動記録後、「習慣スコア」「BPTレベル」のランクが
+ * 上がっていた場合に表示する、レベルアップの演出オーバーレイ。
  * モチベーション向上のため、結果画面から「運動記録を見る」で遷移するタイミングで表示する。
+ * （総運動日数の10日達成は、この演出ではなく記録完了画面のスタンプで表示する）
  */
 const LevelUpView = {
-  itemMeta: {
-    habitLevelUp: { label: "習慣スコア", icon: "star" },
-    assetLevelUp: { label: "BPTレベル", icon: "medal" },
-    daysMilestone: { label: "総運動日数", icon: "calendar" },
-  },
-
   /**
-   * @param {object} achievements RecordView.diffAchievements() の戻り値（null以外）
+   * @param {object} achievements RecordView.diffAchievements() の戻り値。
+   *   habitLevelUp・assetLevelUp のいずれか（または両方）を持つ想定。
    * @param {Function} onDone 演出を閉じたあとに呼ばれるコールバック（画面遷移など）
    */
   show(achievements, onDone) {
-    const hasLevelUp = !!(achievements.habitLevelUp || achievements.assetLevelUp);
-    const title = hasLevelUp ? "レベルアップ！" : "記録更新！";
-
     const items = [];
-    if (achievements.habitLevelUp) items.push(this.renderTransitionItem("habitLevelUp", achievements.habitLevelUp));
-    if (achievements.assetLevelUp) items.push(this.renderTransitionItem("assetLevelUp", achievements.assetLevelUp));
-    if (achievements.daysMilestone) items.push(this.renderMilestoneItem(achievements.daysMilestone));
+    if (achievements.habitLevelUp) items.push(this.renderHabitItem(achievements.habitLevelUp));
+    if (achievements.assetLevelUp) items.push(this.renderAssetItem(achievements.assetLevelUp));
 
     const root = document.getElementById("overlayRoot");
     const overlay = el(`
@@ -29,7 +21,7 @@ const LevelUpView = {
         <div class="result-sheet level-up-sheet">
           <div class="level-up-confetti">${this.renderConfetti()}</div>
           <img src="mascot-body-jump.png" alt="しばまる" class="level-up-mascot" />
-          <div class="level-up-hanko">${icon("star", { size: 16 })} ${title}</div>
+          <div class="level-up-hanko">${icon("star", { size: 16 })} レベルアップ！</div>
           <div class="level-up-items">${items.join("")}</div>
           <button class="btn-primary" id="levelUpCloseBtn">運動記録を見る</button>
         </div>
@@ -58,26 +50,42 @@ const LevelUpView = {
     return pieces;
   },
 
-  renderTransitionItem(key, data) {
-    const meta = this.itemMeta[key];
+  /** 習慣スコアのランクアップ：ランクバッジ画像（PNG）を前後で表示する */
+  renderHabitItem(data) {
     return `
       <div class="level-up-item">
-        <div class="lu-label">${icon(meta.icon, { size: 13 })} ${meta.label}</div>
-        <div class="lu-transition">
-          <span class="from">${data.before}</span>
-          <span class="arrow">→</span>
-          <span class="to">${data.after}</span>
+        <div class="lu-label">${icon("star", { size: 13 })} 習慣スコア</div>
+        <div class="lu-rank-transition">
+          <div class="lu-rank-badge">
+            <img src="${data.before.iconFile}" alt="${data.before.name}" class="lu-rank-badge-img" />
+            <span>${data.before.name}</span>
+          </div>
+          <span class="lu-rank-arrow">→</span>
+          <div class="lu-rank-badge lu-rank-badge-after">
+            <img src="${data.after.iconFile}" alt="${data.after.name}" class="lu-rank-badge-img" />
+            <span>${data.after.name}</span>
+          </div>
         </div>
       </div>
     `;
   },
 
-  renderMilestoneItem(data) {
-    const meta = this.itemMeta.daysMilestone;
+  /** BPTレベル（資産称号）のレベルアップ：称号の背景写真を前後で表示する */
+  renderAssetItem(data) {
     return `
       <div class="level-up-item">
-        <div class="lu-label">${icon(meta.icon, { size: 13 })} ${meta.label}</div>
-        <div class="lu-single">${data.days}日達成！</div>
+        <div class="lu-label">${icon("medal", { size: 13 })} BPTレベル</div>
+        <div class="lu-rank-transition">
+          <div class="lu-rank-badge">
+            <div class="lu-rank-thumb" style="background-image:url('${data.before.bg}');"></div>
+            <span>${data.before.name}</span>
+          </div>
+          <span class="lu-rank-arrow">→</span>
+          <div class="lu-rank-badge lu-rank-badge-after">
+            <div class="lu-rank-thumb" style="background-image:url('${data.after.bg}');"></div>
+            <span>${data.after.name}</span>
+          </div>
+        </div>
       </div>
     `;
   }

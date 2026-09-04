@@ -1561,19 +1561,68 @@ table.sim-table td.negative { color: var(--clay); }
   font-weight: 700;
   margin-bottom: 6px;
 }
-.level-up-item .lu-transition {
+.level-up-item .lu-rank-transition {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 800;
+  justify-content: center;
+  gap: 10px;
 }
-.level-up-item .lu-transition .from { color: var(--ink-faint); font-weight: 600; }
-.level-up-item .lu-transition .arrow { color: var(--brass); }
-.level-up-item .lu-transition .to { color: var(--brass-deep); }
-.level-up-item .lu-single {
-  font-size: 15px;
+.lu-rank-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+}
+.lu-rank-badge span {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  text-align: center;
+  line-height: 1.3;
+}
+.lu-rank-badge-after span {
+  color: var(--brass-deep);
+  font-size: 12.5px;
+}
+.lu-rank-badge-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  opacity: 0.55;
+}
+.lu-rank-badge-after .lu-rank-badge-img {
+  width: 52px;
+  height: 52px;
+  opacity: 1;
+  filter: drop-shadow(0 3px 6px rgba(156, 120, 56, 0.35));
+}
+.lu-rank-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--paper);
+  opacity: 0.55;
+}
+.lu-rank-badge-after .lu-rank-thumb {
+  width: 58px;
+  height: 58px;
+  opacity: 1;
+  box-shadow: 0 3px 8px rgba(156, 120, 56, 0.4);
+}
+.lu-rank-arrow {
+  color: var(--brass);
+  font-size: 18px;
   font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ---- 記録完了画面: 総運動日数の節目スタンプ ---- */
+.days-milestone-hanko {
+  background: var(--brass-soft);
   color: var(--brass-deep);
 }
 

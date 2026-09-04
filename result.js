@@ -46,6 +46,7 @@ const ResultView = {
 
             ${isNewHigh ? `<div class="hanko">${icon("medal", { size: 15 })} 過去最高更新</div>` : ""}
             ${newBestNames.length > 0 ? `<div class="hanko">${icon("star", { size: 14 })} 自己ベスト更新：${newBestNames.join("、")}</div>` : ""}
+            ${achievements && achievements.daysMilestone ? `<div class="hanko days-milestone-hanko">${icon("calendar", { size: 14 })} ${achievements.daysMilestone.days}日達成</div>` : ""}
 
             <div class="hr-dash"></div>
 
@@ -99,7 +100,8 @@ const ResultView = {
     }
     document.getElementById("closeResultBtn").addEventListener("click", () => {
       overlay.remove();
-      if (achievements) {
+      const hasLevelUp = achievements && (achievements.habitLevelUp || achievements.assetLevelUp);
+      if (hasLevelUp) {
         LevelUpView.show(achievements, () => Router.go("asset"));
       } else {
         Router.go("asset");

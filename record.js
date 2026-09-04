@@ -338,6 +338,7 @@ const RecordView = {
   /**
    * レベルアップ演出の判定材料として、現時点の
    * 「習慣スコア（のランク）」「BPTレベル（資産称号）」「総運動日数」を取得する。
+   * ランクは画像（バッジ／背景写真）の表示に使えるよう、オブジェクトごと保持する。
    */
   captureProgressSnapshot() {
     const total = AppState.getAssetTotal();
@@ -347,9 +348,9 @@ const RecordView = {
     ).size;
     return {
       assetTotal: total,
-      assetRankName: getAssetRankInfo(total).current.name,
+      assetRank: getAssetRankInfo(total).current,
       habitScore,
-      habitRankName: HabitCalculator.getRank(habitScore).name,
+      habitRank: HabitCalculator.getRank(habitScore),
       totalExerciseDays,
     };
   },
@@ -361,12 +362,12 @@ const RecordView = {
   diffAchievements(before, after) {
     const achievements = {};
 
-    if (after.habitRankName !== before.habitRankName && after.habitScore > before.habitScore) {
-      achievements.habitLevelUp = { before: before.habitRankName, after: after.habitRankName };
+    if (after.habitRank.name !== before.habitRank.name && after.habitScore > before.habitScore) {
+      achievements.habitLevelUp = { before: before.habitRank, after: after.habitRank };
     }
 
-    if (after.assetRankName !== before.assetRankName && after.assetTotal > before.assetTotal) {
-      achievements.assetLevelUp = { before: before.assetRankName, after: after.assetRankName };
+    if (after.assetRank.name !== before.assetRank.name && after.assetTotal > before.assetTotal) {
+      achievements.assetLevelUp = { before: before.assetRank, after: after.assetRank };
     }
 
     // 総運動日数が10日区切り（10日, 20日, 30日…）をまたいだ場合のみ「記録更新」として扱う
