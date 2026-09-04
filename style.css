@@ -1618,10 +1618,19 @@ table.sim-table td.negative { color: var(--clay); }
 .level-up-item .lu-rank-names .arrow { color: var(--brass); flex-shrink: 0; }
 .level-up-item .lu-rank-names .to { color: var(--brass-deep); font-size: 13.5px; }
 
-/* ---- 記録完了画面: 総運動日数の節目スタンプ ---- */
-.days-milestone-hanko {
-  background: var(--brass-soft);
-  color: var(--brass-deep);
+/* ---- 記録完了画面: 総運動日数の節目を記録完了スタンプに統合表示 ---- */
+.complete-hanko-milestone {
+  padding: 8px 20px 9px;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.complete-hanko-sub {
+  display: block;
+  white-space: nowrap;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  margin-top: 3px;
 }
 
 /* ---- スプラッシュスクリーン ---- */
