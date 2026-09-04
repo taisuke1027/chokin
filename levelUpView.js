@@ -55,16 +55,15 @@ const LevelUpView = {
     return `
       <div class="level-up-item">
         <div class="lu-label">${icon("star", { size: 13 })} 習慣スコア</div>
-        <div class="lu-rank-transition">
-          <div class="lu-rank-badge">
-            <img src="${data.before.iconFile}" alt="${data.before.name}" class="lu-rank-badge-img" />
-            <span>${data.before.name}</span>
-          </div>
+        <div class="lu-rank-images">
+          <img src="${data.before.iconFile}" alt="${data.before.name}" class="lu-rank-badge-img" />
           <span class="lu-rank-arrow">→</span>
-          <div class="lu-rank-badge lu-rank-badge-after">
-            <img src="${data.after.iconFile}" alt="${data.after.name}" class="lu-rank-badge-img" />
-            <span>${data.after.name}</span>
-          </div>
+          <img src="${data.after.iconFile}" alt="${data.after.name}" class="lu-rank-badge-img lu-rank-badge-img-after" />
+        </div>
+        <div class="lu-rank-names">
+          <span class="from">${data.before.name}</span>
+          <span class="arrow">→</span>
+          <span class="to">${data.after.name}</span>
         </div>
       </div>
     `;
@@ -75,16 +74,15 @@ const LevelUpView = {
     return `
       <div class="level-up-item">
         <div class="lu-label">${icon("medal", { size: 13 })} BPTレベル</div>
-        <div class="lu-rank-transition">
-          <div class="lu-rank-badge">
-            <div class="lu-rank-thumb" style="background-image:url('${data.before.bg}');"></div>
-            <span>${data.before.name}</span>
-          </div>
+        <div class="lu-rank-images">
+          <div class="lu-rank-thumb" style="background-image:url('${data.before.bg}');"></div>
           <span class="lu-rank-arrow">→</span>
-          <div class="lu-rank-badge lu-rank-badge-after">
-            <div class="lu-rank-thumb" style="background-image:url('${data.after.bg}');"></div>
-            <span>${data.after.name}</span>
-          </div>
+          <div class="lu-rank-thumb lu-rank-thumb-after" style="background-image:url('${data.after.bg}');"></div>
+        </div>
+        <div class="lu-rank-names">
+          <span class="from">${data.before.name}</span>
+          <span class="arrow">→</span>
+          <span class="to">${data.after.name}</span>
         </div>
       </div>
     `;

@@ -214,7 +214,6 @@ const RecordView = {
   loadTemplate(templateId) {
     const t = Storage.getTemplates().find(x => x.id === templateId);
     if (!t) return;
-    let addedCount = 0;
     t.items.forEach(item => {
       const exerciseDef = EXERCISES[item.category] && EXERCISES[item.category].find(e => e.id === item.exerciseId);
       if (!exerciseDef) return;
@@ -226,9 +225,7 @@ const RecordView = {
         fields: item.fields,
         summary: this.summarize(item.category, item.fields),
       });
-      addedCount += 1;
     });
-    showToast(`「${t.name}」を追加予定の運動に反映しました（${addedCount}件）`);
     Router.refresh();
   },
 

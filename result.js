@@ -46,7 +46,7 @@ const ResultView = {
 
             ${isNewHigh ? `<div class="hanko">${icon("medal", { size: 15 })} 過去最高更新</div>` : ""}
             ${newBestNames.length > 0 ? `<div class="hanko">${icon("star", { size: 14 })} 自己ベスト更新：${newBestNames.join("、")}</div>` : ""}
-            ${achievements && achievements.daysMilestone ? `<div class="hanko days-milestone-hanko">${icon("calendar", { size: 14 })} ${achievements.daysMilestone.days}日達成</div>` : ""}
+            ${achievements && achievements.daysMilestone ? `<div class="hanko days-milestone-hanko">${icon("calendar", { size: 14 })} 総運動日${achievements.daysMilestone.days}日達成</div>` : ""}
 
             <div class="hr-dash"></div>
 
