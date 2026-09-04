@@ -306,6 +306,9 @@ const RecordView = {
 
     const recordDate = this.state.recordDate || todayStr();
 
+    // レベルアップ／記録更新の演出用に、記録を保存する前の状態を控えておく
+    const beforeSnapshot = this.captureProgressSnapshot();
+
     const results = this.state.queue.map(entry => {
       const result = BptCalculator.processWorkout({
         exerciseDef: entry.exerciseDef,
@@ -322,11 +325,58 @@ const RecordView = {
     AppState.season = Storage.getSeason(AppState.season.id);
     AppState.recomputeHabitScore();
 
+    const afterSnapshot = this.captureProgressSnapshot();
+    const achievements = this.diffAchievements(beforeSnapshot, afterSnapshot);
+
     this.state.queue = [];
     this.state.recordDate = null; // 次回はまた「今日」から始める
     this.resetForm();
 
-    ResultView.showBatch(results);
+    ResultView.showBatch(results, achievements);
+  },
+
+  /**
+   * レベルアップ演出の判定材料として、現時点の
+   * 「習慣スコア（のランク）」「BPTレベル（資産称号）」「総運動日数」を取得する。
+   */
+  captureProgressSnapshot() {
+    const total = AppState.getAssetTotal();
+    const habitScore = AppState.getHabitScore().score;
+    const totalExerciseDays = new Set(
+      Storage.getWorkoutRecordsBySeason(AppState.season.id).map(r => r.date.slice(0, 10))
+    ).size;
+    return {
+      assetTotal: total,
+      assetRankName: getAssetRankInfo(total).current.name,
+      habitScore,
+      habitRankName: HabitCalculator.getRank(habitScore).name,
+      totalExerciseDays,
+    };
+  },
+
+  /**
+   * 記録前後のスナップショットを比較し、レベルアップ・記録更新の演出が必要かどうかを判定する。
+   * @returns {object|null} 該当する項目がなければ null
+   */
+  diffAchievements(before, after) {
+    const achievements = {};
+
+    if (after.habitRankName !== before.habitRankName && after.habitScore > before.habitScore) {
+      achievements.habitLevelUp = { before: before.habitRankName, after: after.habitRankName };
+    }
+
+    if (after.assetRankName !== before.assetRankName && after.assetTotal > before.assetTotal) {
+      achievements.assetLevelUp = { before: before.assetRankName, after: after.assetRankName };
+    }
+
+    // 総運動日数が10日区切り（10日, 20日, 30日…）をまたいだ場合のみ「記録更新」として扱う
+    const beforeMilestone = Math.floor(before.totalExerciseDays / 10);
+    const afterMilestone = Math.floor(after.totalExerciseDays / 10);
+    if (afterMilestone > beforeMilestone && after.totalExerciseDays > before.totalExerciseDays) {
+      achievements.daysMilestone = { days: afterMilestone * 10 };
+    }
+
+    return Object.keys(achievements).length > 0 ? achievements : null;
   },
 };
 

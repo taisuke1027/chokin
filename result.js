@@ -5,8 +5,10 @@
 const ResultView = {
   /**
    * @param {Array<object>} results BptCalculator.processWorkout の戻り値の配列（exerciseDef付き）
+   * @param {object|null} achievements RecordView.diffAchievements() の戻り値。
+   *   習慣スコア／BPTレベル／総運動日数（10日間隔）のいずれかが更新されていた場合に渡される。
    */
-  showBatch(results) {
+  showBatch(results, achievements) {
     const totalGainBPT = results.reduce((s, r) => s + r.totalGainBPT, 0);
     const gain = results.reduce((acc, r) => ({
       cardio: acc.cardio + r.gain.cardio,
@@ -97,7 +99,11 @@ const ResultView = {
     }
     document.getElementById("closeResultBtn").addEventListener("click", () => {
       overlay.remove();
-      Router.go("asset");
+      if (achievements) {
+        LevelUpView.show(achievements, () => Router.go("asset"));
+      } else {
+        Router.go("asset");
+      }
     });
     document.getElementById("anotherResultBtn").addEventListener("click", () => {
       overlay.remove();

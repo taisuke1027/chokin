@@ -8,7 +8,7 @@
  * ------------------------------------------------------------------
  */
 
-const CACHE_VERSION = "chikutate-v2";
+const CACHE_VERSION = "chikutate-v3";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -43,6 +43,7 @@ const CORE_ASSETS = [
   "./exercisePicker.js",
   "./template.js",
   "./result.js",
+  "./levelUpView.js",
   "./edit.js",
   "./asset.js",
   "./seasons.js",

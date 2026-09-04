@@ -1485,6 +1485,98 @@ table.sim-table td.negative { color: var(--clay); }
   animation: praisePopIn 0.5s cubic-bezier(.34,1.56,.64,1) 0.05s both;
 }
 
+/* ---- レベルアップ／記録更新 演出オーバーレイ ---- */
+.level-up-sheet {
+  position: relative;
+  overflow: hidden;
+}
+.level-up-confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.confetti-piece {
+  position: absolute;
+  top: -14px;
+  width: 7px;
+  height: 10px;
+  opacity: 0.95;
+  animation-name: confettiFall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+.confetti-piece.circle { border-radius: 50%; width: 7px; height: 7px; }
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.95; }
+  100% { transform: translateY(260px) rotate(320deg); opacity: 0; }
+}
+.level-up-mascot {
+  display: block;
+  width: 116px;
+  height: auto;
+  margin: 4px auto 8px;
+  position: relative;
+  z-index: 1;
+  animation: praisePopIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.level-up-hanko {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px auto 16px;
+  padding: 8px 24px;
+  border: 3px solid var(--brass-deep);
+  border-radius: 8px;
+  color: var(--brass-deep);
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  position: relative;
+  z-index: 1;
+  animation: hankoStamp 0.45s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.level-up-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 20px;
+  position: relative;
+  z-index: 1;
+  text-align: left;
+}
+.level-up-item {
+  background: var(--paper-deep);
+  border-radius: var(--radius-m);
+  padding: 12px 14px;
+  animation: badgeIn 0.25s ease both;
+}
+.level-up-item .lu-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.level-up-item .lu-transition {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.level-up-item .lu-transition .from { color: var(--ink-faint); font-weight: 600; }
+.level-up-item .lu-transition .arrow { color: var(--brass); }
+.level-up-item .lu-transition .to { color: var(--brass-deep); }
+.level-up-item .lu-single {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brass-deep);
+}
+
 /* ---- スプラッシュスクリーン ---- */
 #splashScreen {
   position: fixed;
