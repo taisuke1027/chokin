@@ -349,6 +349,7 @@ const AssetView = {
           </div>
 
           <div class="edit-actions">
+            <button class="btn-primary" id="dayDetailAddRecordBtn">運動を記録する</button>
             <button class="btn-secondary" id="dayDetailCloseBtn">閉じる</button>
           </div>
         </div>
@@ -356,8 +357,16 @@ const AssetView = {
     `);
     root.appendChild(overlay);
 
+    lockBodyScroll();
+    bindSwipeDownToClose(overlay.querySelector(".result-sheet"), overlay);
+
     overlay.addEventListener("click", (e) => { if (e.target === overlay) this.removeDayDetailOverlay(); });
     document.getElementById("dayDetailCloseBtn").addEventListener("click", () => this.removeDayDetailOverlay());
+    document.getElementById("dayDetailAddRecordBtn").addEventListener("click", () => {
+      RecordView.state.recordDate = dateKey;
+      this.removeDayDetailOverlay();
+      Router.go("record");
+    });
 
     document.getElementById("dayDetailSelectBtn").addEventListener("click", () => {
       this.detailSelectMode = !this.detailSelectMode;
@@ -401,7 +410,7 @@ const AssetView = {
 
   removeDayDetailOverlay() {
     const existing = document.getElementById("dayDetailOverlay");
-    if (existing) existing.remove();
+    if (existing) closeOverlay(existing);
   },
 
   renderDayDetailRow(r) {
