@@ -64,13 +64,16 @@ const AppState = {
   },
 
   computeConsecutiveWeeks() {
-    // 直近から遡って、運動記録が1件以上ある週が連続している数を数える
+    // 「継続度」は暦週（日曜日始まり〜土曜日終わり）を単位に、今週から遡って
+    // 運動記録が1件もない週に当たるまでの連続週数を数える。
+    // （習慣スコアの有酸素・筋力達成率などで使う「直近7日間のローリングウィンドウ」とは
+    //   別の基準なので、currentWeekStart()は使わない）
     const records = Storage.getWorkoutRecordsBySeason(this.season.id);
     if (records.length === 0) return 0;
     let weeks = 0;
-    let cursor = this.currentWeekStart();
+    let cursor = startOfCalendarWeek(todayStr()); // 今週の日曜日
     for (let i = 0; i < 52; i++) {
-      const weekEnd = addDaysStr(cursor, 6);
+      const weekEnd = addDaysStr(cursor, 6); // その週の土曜日
       const hasRecord = records.some(r => {
         const d = r.date.slice(0, 10);
         return d >= cursor && d <= weekEnd;
@@ -110,6 +113,13 @@ const AppState = {
 function addDaysStr(dateStr, n) {
   const d = new Date(dateStr + "T00:00:00");
   d.setDate(d.getDate() + n);
+  return todayStr(d);
+}
+
+/** 指定日を含む暦週（日曜日始まり）の日曜日の日付文字列を返す */
+function startOfCalendarWeek(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  d.setDate(d.getDate() - d.getDay()); // getDay(): 0=日曜日
   return todayStr(d);
 }
 
