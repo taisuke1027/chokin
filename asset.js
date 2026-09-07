@@ -133,13 +133,27 @@ const AssetView = {
       { key: "endurance", color: this.colors.endurance, label: "筋持久力" },
     ];
     return rows.map(l => {
+      const baseline = first[l.key];
       const change = last[l.key] - first[l.key];
+
+      // 選択した期間の最初の値と比較した割合。開始時点が0の場合は割合が
+      // 定義できない（無限大になる）ため、変化があれば「新規」、なければ非表示にする。
+      let pctHtml = "";
+      if (baseline > 0) {
+        pctHtml = `<span class="num trend-pct">(${Fmt.signedPct(change / baseline)})</span>`;
+      } else if (change > 0) {
+        pctHtml = `<span class="num trend-pct">(新規)</span>`;
+      }
+
       return `
         <div class="flex-between" style="padding:7px 0;">
           <span style="display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-soft);">
             <span class="stack-legend-swatch" style="background:${l.color}"></span>${l.label}
           </span>
-          <span class="num" style="font-weight:700; color:${change >= 0 ? "var(--brass-deep)" : "var(--clay)"}">${Fmt.signedBpt(change)}</span>
+          <span style="display:flex; align-items:baseline; gap:5px;">
+            <span class="num" style="font-weight:700; color:${change >= 0 ? "var(--brass-deep)" : "var(--clay)"}">${Fmt.signedBpt(change)}</span>
+            ${pctHtml}
+          </span>
         </div>
       `;
     }).join("");
