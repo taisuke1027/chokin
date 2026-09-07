@@ -22,6 +22,12 @@ const Fmt = {
   pct(n, digits = 1) {
     return (n * 100).toFixed(digits) + "%";
   },
+  /** 割合の変化を「+12.3%」「-5.0%」のように符号付きで表示する（nは0〜1の比率） */
+  signedPct(n, digits = 1) {
+    const val = n * 100;
+    const sign = val > 0 ? "+" : val < 0 ? "" : "±";
+    return sign + val.toFixed(digits) + "%";
+  },
   dateJp(isoOrDateStr) {
     const d = new Date(isoOrDateStr);
     return `${d.getMonth() + 1}/${d.getDate()}`;
