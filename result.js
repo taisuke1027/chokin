@@ -102,17 +102,20 @@ const ResultView = {
     }
     document.getElementById("closeResultBtn").addEventListener("click", () => {
       overlay.remove();
-      const hasLevelUp = achievements && (achievements.habitLevelUp || achievements.assetLevelUp);
-      if (hasLevelUp) {
-        LevelUpView.show(achievements, () => Router.go("asset"));
-      } else {
-        Router.go("asset");
-      }
+      Router.go("asset");
     });
     document.getElementById("anotherResultBtn").addEventListener("click", () => {
       overlay.remove();
       Router.go("record");
     });
+
+    // 習慣スコア・BPTレベルのランクアップがあれば、「記録完了」画面が表示された
+    // このタイミングで、その上に重ねてレベルアップ演出を表示する。
+    // （✕で閉じると、下の「記録完了」画面がそのまま見える状態に戻る）
+    const hasLevelUp = achievements && (achievements.habitLevelUp || achievements.assetLevelUp);
+    if (hasLevelUp) {
+      LevelUpView.show(achievements);
+    }
   },
 
   /**

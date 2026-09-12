@@ -1,16 +1,17 @@
 /**
  * levelUpView.js — 運動記録後、「習慣スコア」「BPTレベル」のランクが
  * 上がっていた場合に表示する、レベルアップの演出オーバーレイ。
- * モチベーション向上のため、結果画面から「運動記録を見る」で遷移するタイミングで表示する。
+ * モチベーション向上のため、「記録完了」画面が表示されたタイミングで
+ * その上に重ねて自動的に表示する。右上の✕で閉じると、下の「記録完了」
+ * 画面がそのまま表示された状態に戻る。
  * （総運動日数の10日達成は、この演出ではなく記録完了画面のスタンプで表示する）
  */
 const LevelUpView = {
   /**
    * @param {object} achievements RecordView.diffAchievements() の戻り値。
    *   habitLevelUp・assetLevelUp のいずれか（または両方）を持つ想定。
-   * @param {Function} onDone 演出を閉じたあとに呼ばれるコールバック（画面遷移など）
    */
-  show(achievements, onDone) {
+  show(achievements) {
     const items = [];
     if (achievements.habitLevelUp) items.push(this.renderHabitItem(achievements.habitLevelUp));
     if (achievements.assetLevelUp) items.push(this.renderAssetItem(achievements.assetLevelUp));
@@ -19,20 +20,19 @@ const LevelUpView = {
     const overlay = el(`
       <div class="overlay" id="levelUpOverlay">
         <div class="result-sheet level-up-sheet">
+          <button class="picker-close-btn level-up-close-btn" id="levelUpCloseBtn">✕</button>
           <div class="level-up-confetti">${this.renderConfetti()}</div>
           <img src="mascot-body-jump.png" alt="しばまる" class="level-up-mascot" />
           <div class="level-up-hanko">${icon("star", { size: 16 })} レベルアップ！</div>
           <div class="level-up-items">${items.join("")}</div>
-          <button class="btn-primary" id="levelUpCloseBtn">運動記録を見る</button>
         </div>
       </div>
     `);
     root.appendChild(overlay);
 
-    document.getElementById("levelUpCloseBtn").addEventListener("click", () => {
-      overlay.remove();
-      if (onDone) onDone();
-    });
+    bindSwipeDownToClose(overlay.querySelector(".result-sheet"), overlay);
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeOverlay(overlay); });
+    document.getElementById("levelUpCloseBtn").addEventListener("click", () => closeOverlay(overlay));
   },
 
   renderConfetti() {
