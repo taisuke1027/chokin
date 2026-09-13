@@ -8,7 +8,7 @@
  * ------------------------------------------------------------------
  */
 
-const CACHE_VERSION = "chikutate-v11";
+const CACHE_VERSION = "chikutate-v12";
 const CORE_ASSETS = [
   "./",
   "./index.html",

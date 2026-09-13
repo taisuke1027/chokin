@@ -419,6 +419,24 @@ const AssetView = {
           EditRecordView.show(record);
         });
       });
+
+      overlay.querySelectorAll(".swipe-row").forEach(rowEl => {
+        const id = rowEl.dataset.swipeRecordId;
+        const contentEl = rowEl.querySelector(".swipe-content");
+        const deleteEl = rowEl.querySelector(".swipe-delete-action");
+        bindSwipeToDelete(rowEl, contentEl, deleteEl, () => {
+          const record = records.find(r => r.id === id);
+          if (!record) return;
+          ConfirmDialog.show("この記録を削除しますか？", () => {
+            const result = BptCalculator.deleteWorkout(record.id);
+            AppState.season = Storage.getSeason(AppState.season.id);
+            AppState.recomputeHabitScore();
+            showToast(`記録を削除しました（${Fmt.signedBpt(result.delta.cardio + result.delta.strength + result.delta.endurance)} BPT）`);
+            this.renderDayDetailOverlay();
+            Router.refresh();
+          }, { confirmLabel: "削除" });
+        });
+      });
     }
   },
 
@@ -451,17 +469,20 @@ const AssetView = {
     }
 
     return `
-      <button class="ledger-entry clickable" data-record-id="${r.id}">
-        <div class="le-left">
-          <div class="le-icon">${icon(iconName, { size: 16 })}</div>
-          <div>
-            <div class="le-name">${def ? def.name : r.exerciseId}</div>
-            <div class="le-sub">${sub}</div>
+      <div class="swipe-row" data-swipe-record-id="${r.id}">
+        <button class="swipe-delete-action" data-delete-id="${r.id}">${icon("trash", { size: 16 })} 削除</button>
+        <button class="ledger-entry clickable swipe-content" data-record-id="${r.id}">
+          <div class="le-left">
+            <div class="le-icon">${icon(iconName, { size: 16 })}</div>
+            <div>
+              <div class="le-name">${def ? def.name : r.exerciseId}</div>
+              <div class="le-sub">${sub}</div>
+            </div>
           </div>
-        </div>
-        <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
-        <div class="le-chevron">›</div>
-      </button>
+          <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
+          <div class="le-chevron">›</div>
+        </button>
+      </div>
     `;
   },
 

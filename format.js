@@ -74,6 +74,95 @@ function closeOverlay(overlayEl) {
 }
 
 /**
+ * リストの行を左にスワイプすると「削除」ボタンが裏から現れる、iOS風のスワイプ削除。
+ * 指の動きにそのまま追従し、離した時に一定以上スワイプしていれば開いたまま留まり、
+ * そうでなければヌルッと元の位置に戻る。同じ画面内で別の行を開くと、
+ * 先に開いていた行は自動的に閉じる。開いている状態で行本体をタップすると、
+ * （本来のクリック動作は起こさず）閉じるだけにする。
+ * @param {HTMLElement} rowEl 行全体のラッパー（overflow:hiddenのコンテナ、delete-actionと重なる）
+ * @param {HTMLElement} contentEl スワイプで動かす表側のコンテンツ要素
+ * @param {HTMLElement} deleteEl 裏に隠れている削除ボタン要素
+ * @param {Function} onDelete 削除ボタンが押された時に呼ばれるコールバック
+ */
+function bindSwipeToDelete(rowEl, contentEl, deleteEl, onDelete) {
+  const REVEAL = 76;
+  let touchStartX = null;
+  let touchStartY = null;
+  let dragging = false;
+  let horizontal = null;
+
+  function closeRow() {
+    contentEl.style.transition = "transform 0.2s ease";
+    contentEl.style.transform = "translateX(0px)";
+    rowEl.classList.remove("swipe-open");
+  }
+  function openRow() {
+    contentEl.style.transition = "transform 0.2s ease";
+    contentEl.style.transform = `translateX(-${REVEAL}px)`;
+    rowEl.classList.add("swipe-open");
+  }
+  rowEl._closeSwipe = closeRow;
+
+  contentEl.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    dragging = true;
+    horizontal = null;
+    contentEl.style.transition = "none";
+  }, { passive: true });
+
+  contentEl.addEventListener("touchmove", (e) => {
+    if (!dragging || touchStartX === null) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = e.touches[0].clientY - touchStartY;
+
+    if (horizontal === null) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      horizontal = Math.abs(dx) > Math.abs(dy) * 1.2;
+      if (horizontal) closeOtherSwipeRows(rowEl);
+    }
+    if (!horizontal) return;
+
+    const base = rowEl.classList.contains("swipe-open") ? -REVEAL : 0;
+    const next = Math.max(-REVEAL, Math.min(0, base + dx));
+    contentEl.style.transform = `translateX(${next}px)`;
+    e.preventDefault();
+  }, { passive: false });
+
+  contentEl.addEventListener("touchend", (e) => {
+    if (!dragging || touchStartX === null) { dragging = false; touchStartX = null; return; }
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    dragging = false;
+    touchStartX = null;
+    if (!horizontal) return;
+
+    const base = rowEl.classList.contains("swipe-open") ? -REVEAL : 0;
+    if (base + dx < -REVEAL / 2) openRow();
+    else closeRow();
+  }, { passive: true });
+
+  // 開いている状態でのタップは、本来のクリック動作の代わりに閉じるだけにする
+  contentEl.addEventListener("click", (e) => {
+    if (rowEl.classList.contains("swipe-open")) {
+      e.preventDefault();
+      e.stopPropagation();
+      closeRow();
+    }
+  }, true);
+
+  deleteEl.addEventListener("click", (e) => {
+    e.stopPropagation();
+    onDelete();
+  });
+}
+/** 同じ画面内で、他に開いているスワイプ削除の行があればすべて閉じる */
+function closeOtherSwipeRows(exceptRowEl) {
+  document.querySelectorAll(".swipe-row.swipe-open").forEach(row => {
+    if (row !== exceptRowEl && row._closeSwipe) row._closeSwipe();
+  });
+}
+
+/**
  * ページ全体を右にスワイプすると、指定した画面へ「戻る」ように振る舞う。
  * ドラッグ中は指の動きにシートがそのまま追従し、離した時に十分右へ
  * スワイプしていればそのまま滑り落ちるように戻り、途中で離した場合は

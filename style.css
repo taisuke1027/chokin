@@ -625,6 +625,39 @@ svg.stacked-chart .stack-line { fill: none; stroke-width: 1.5; }
 }
 .ledger-entry .le-chevron { color: var(--ink-faint); margin-left: 6px; flex-shrink: 0; }
 
+/* ---- 運動記録の行: 左スワイプで削除ボタンを表示する ---- */
+.swipe-row {
+  position: relative;
+  overflow: hidden;
+}
+.swipe-row .swipe-content {
+  position: relative;
+  z-index: 1;
+  background: var(--paper);
+}
+.swipe-delete-action {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: var(--clay);
+  color: #fff;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 0;
+}
+/* .ledger-entryが.swipe-row内にネストされ、常にその中の最後の要素になるため、
+   本来の「リスト全体の最後の行」の判定は親（.swipe-row）側で行う必要がある */
+.swipe-row .swipe-content { border-bottom: 1px solid var(--rule); }
+.swipe-row:last-child .swipe-content { border-bottom: none; }
+
 /* ---- 結果 / 編集オーバーレイ ---- */
 .overlay {
   position: fixed;
