@@ -1504,12 +1504,6 @@ table.sim-table td.negative { color: var(--clay); }
   position: relative;
   z-index: 1;
 }
-.level-up-close-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 3;
-}
 .level-up-confetti {
   position: absolute;
   inset: 0;
