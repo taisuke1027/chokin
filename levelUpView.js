@@ -16,15 +16,24 @@ const LevelUpView = {
     if (achievements.habitLevelUp) items.push(this.renderHabitItem(achievements.habitLevelUp));
     if (achievements.assetLevelUp) items.push(this.renderAssetItem(achievements.assetLevelUp));
 
+    // 下に見えている「記録完了」シートと上端が揃うよう、そのシートの高さに
+    // 合わせる（どちらも画面下端からの「せり上がり」なので、高さを揃えれば
+    // 上端も自然と揃う）。記録完了シートが見つからない場合は通常通り
+    // コンテンツに応じた高さのままにする。
+    const baseSheet = document.querySelector("#resultOverlay .result-sheet");
+    const matchHeight = baseSheet ? baseSheet.getBoundingClientRect().height : null;
+
     const root = document.getElementById("overlayRoot");
     const overlay = el(`
       <div class="overlay" id="levelUpOverlay">
-        <div class="result-sheet level-up-sheet">
+        <div class="result-sheet level-up-sheet"${matchHeight ? ` style="height:${matchHeight}px;"` : ""}>
           <button class="picker-close-btn level-up-close-btn" id="levelUpCloseBtn">✕</button>
           <div class="level-up-confetti">${this.renderConfetti()}</div>
-          <img src="mascot-body-jump.png" alt="しばまる" class="level-up-mascot" />
-          <div class="level-up-hanko">${icon("star", { size: 16 })} レベルアップ！</div>
-          <div class="level-up-items">${items.join("")}</div>
+          <div class="level-up-body">
+            <img src="mascot-body-jump.png" alt="しばまる" class="level-up-mascot" />
+            <div class="level-up-hanko">${icon("star", { size: 16 })} レベルアップ！</div>
+            <div class="level-up-items">${items.join("")}</div>
+          </div>
         </div>
       </div>
     `);

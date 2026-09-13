@@ -1496,6 +1496,13 @@ table.sim-table td.negative { color: var(--clay); }
 .level-up-sheet {
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.level-up-body {
+  position: relative;
+  z-index: 1;
 }
 .level-up-close-btn {
   position: absolute;
