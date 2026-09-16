@@ -1612,58 +1612,58 @@ table.sim-table td.negative { color: var(--clay); }
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  margin-bottom: 8px;
+  gap: 16px;
+  margin-bottom: 10px;
 }
 .lu-rank-badge-img {
-  width: 40px;
-  height: 40px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
-  opacity: 0.55;
+  opacity: 0.5;
   flex-shrink: 0;
 }
 .lu-rank-badge-img-after {
-  width: 52px;
-  height: 52px;
+  width: 108px;
+  height: 108px;
   opacity: 1;
-  filter: drop-shadow(0 3px 6px rgba(156, 120, 56, 0.35));
+  filter: drop-shadow(0 4px 10px rgba(156, 120, 56, 0.4));
 }
 .lu-rank-thumb {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   border-radius: 10px;
   background-size: cover;
   background-position: center;
   background-color: var(--paper);
-  opacity: 0.55;
+  opacity: 0.5;
   flex-shrink: 0;
 }
 .lu-rank-thumb-after {
-  width: 58px;
-  height: 58px;
+  width: 108px;
+  height: 108px;
+  border-radius: 16px;
   opacity: 1;
-  box-shadow: 0 3px 8px rgba(156, 120, 56, 0.4);
+  box-shadow: 0 4px 12px rgba(156, 120, 56, 0.45);
 }
 .lu-rank-arrow {
   color: var(--brass);
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 800;
   flex-shrink: 0;
 }
 .level-up-item .lu-rank-names {
   display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  overflow-x: auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
   font-size: 12.5px;
   font-weight: 700;
+  text-align: center;
+  white-space: normal;
 }
 .level-up-item .lu-rank-names .from { color: var(--ink-faint); font-weight: 600; }
-.level-up-item .lu-rank-names .arrow { color: var(--brass); flex-shrink: 0; }
-.level-up-item .lu-rank-names .to { color: var(--brass-deep); font-size: 13.5px; }
+.level-up-item .lu-rank-names .arrow { color: var(--brass); font-size: 13px; }
+.level-up-item .lu-rank-names .to { color: var(--brass-deep); font-size: 14.5px; }
 
 /* ---- 記録完了画面: 総運動日数の節目を記録完了スタンプに統合表示 ---- */
 .complete-hanko-milestone {

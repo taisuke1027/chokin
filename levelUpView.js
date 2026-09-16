@@ -71,7 +71,7 @@ const LevelUpView = {
         </div>
         <div class="lu-rank-names">
           <span class="from">${data.before.name}</span>
-          <span class="arrow">→</span>
+          <span class="arrow">↓</span>
           <span class="to">${data.after.name}</span>
         </div>
       </div>
@@ -90,7 +90,7 @@ const LevelUpView = {
         </div>
         <div class="lu-rank-names">
           <span class="from">${data.before.name}</span>
-          <span class="arrow">→</span>
+          <span class="arrow">↓</span>
           <span class="to">${data.after.name}</span>
         </div>
       </div>
