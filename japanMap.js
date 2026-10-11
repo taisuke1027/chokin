@@ -107,12 +107,12 @@ const JapanMapView = {
 
     return `
       <div class="japan-map-wrap">
-        <svg class="japan-map-svg" viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="都道府県一周レベルの達成状況マップ">
+        <svg class="japan-map-svg" viewBox="0 0 1000 1050" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="都道府県一周レベルの達成状況マップ">
           ${prefPaths}
           <g class="jmap-okinawa-inset">
-            <rect x="10" y="845" width="190" height="45" rx="6" class="jmap-inset-box" />
-            <text x="18" y="859" class="jmap-inset-label">沖縄県</text>
-            <g transform="translate(60 858) scale(2.6)">
+            <rect x="10" y="975" width="190" height="45" rx="6" class="jmap-inset-box" />
+            <text x="18" y="989" class="jmap-inset-label">沖縄県</text>
+            <g transform="translate(60 988) scale(2.6)">
               <path class="jmap-pref${okinawaCls ? " " + okinawaCls : ""}" d="${OKINAWA_INSET_PATH}"><title>沖縄県</title></path>
             </g>
           </g>
