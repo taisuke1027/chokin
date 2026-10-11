@@ -8,7 +8,7 @@
  * ------------------------------------------------------------------
  */
 
-const CACHE_VERSION = "chikutate-v13";
+const CACHE_VERSION = "chikutate-v14";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -34,6 +34,7 @@ const CORE_ASSETS = [
   "./chart.js",
   "./picker.js",
   "./confirm.js",
+  "./japanMap.js",
   "./home.js",
   "./bptInfo.js",
   "./pressureInfo.js",

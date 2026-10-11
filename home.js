@@ -106,6 +106,7 @@ const HomeView = {
                 ` : `<div class="asset-rank-next">称号は最高位です！</div>`}
               </div>
             </div>
+            ${JapanMapView.render(total)}
           </div>
         </div>
 
