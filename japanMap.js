@@ -112,8 +112,8 @@ const JapanMapView = {
         <svg class="japan-map-svg" viewBox="0 0 1000 960" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="都道府県一周レベルの達成状況マップ">
           ${prefPaths}
           <g class="jmap-okinawa-inset">
-            <rect x="700" y="770" width="230" height="80" rx="4" class="jmap-inset-box" />
-            <g transform="translate(710 782) scale(0.43)">
+            <rect x="680" y="755" width="300" height="95" rx="4" class="jmap-inset-box" />
+            <g transform="translate(690 764) scale(0.6)">
               <path class="jmap-pref${okinawaCls ? " " + okinawaCls : ""}" d="${OKINAWA_INSET_PATH}"><title>沖縄県</title></path>
             </g>
           </g>

@@ -1973,9 +1973,16 @@ table.sim-table td.negative { color: var(--clay); }
 .jmap-pref.achieved { fill: #9CCC65; }
 .jmap-pref.next { fill: #F2994A; }
 .jmap-inset-box {
-  fill: var(--paper);
+  fill: var(--surface);
   stroke: var(--rule-strong);
   stroke-width: 1.5;
+}
+/* 沖縄のインセットは縮小表示（scale）がかかっているため、
+   塗り・線のコントラストが本土側より弱まりがち。
+   はっきり見えるよう、線の色を濃くし、太さも縮小分を補正しておく。 */
+.jmap-okinawa-inset .jmap-pref {
+  stroke: var(--ink-faint);
+  stroke-width: 2.2;
 }
 .japan-map-legend {
   display: flex;
