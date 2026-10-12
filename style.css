@@ -1977,12 +1977,6 @@ table.sim-table td.negative { color: var(--clay); }
   stroke: var(--rule-strong);
   stroke-width: 1.5;
 }
-.jmap-inset-label {
-  font-size: 11px;
-  font-weight: 700;
-  fill: var(--ink-soft);
-  font-family: var(--font-body);
-}
 .japan-map-legend {
   display: flex;
   justify-content: center;

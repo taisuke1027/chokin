@@ -63,11 +63,13 @@ const JAPAN_PREFECTURE_PATHS = {
 };
 
 /**
- * 沖縄県：元データでは遠隔地表示用の特殊な座標変換がかかっており、
- * そのままでは正しく配置できないため、代表的な島の形を単純化して描画し、
- * 他の都道府県とは別枠（インセット）の小さな囲みの中に配置する。
+ * 沖縄県：実際の島の形（南西諸島の連なり）をもとにした座標データ。
+ * 元データでは遠隔地表示用の特殊な座標変換がかかっていたため、
+ * 座標を正規化（0,0基準に平行移動）した上で、他の都道府県とは別枠
+ * （インセット）の小さな囲みの中に、日本列島の右下に配置する。
+ * 正規化前のバウンディングボックス: x[-325,144] y[1176,1304]（幅469×高さ128）
  */
-const OKINAWA_INSET_PATH = "M4 10c6 -7 18 -8 28 -3c8 4 18 3 26 -2c7 -4 16 -3 21 3c4 5 3 12 -3 15c-9 5 -20 3 -29 -1c-10 -4 -22 -5 -32 0c-7 3 -15 1 -18 -5c-3 -4 -1 -5 7 -7z";
+const OKINAWA_INSET_PATH = "M4 107l3 1 -2 1 -5 -1zM49 119l6 3 -4 6 -11 -5 2 -2 3 2 1 -7zM127 105l-1 -4 3 2zM133 111l-3 -2h2l-1 -3 2 -2 -1 -5 3 8 7 6zM225 22v5l-5 -5 3 -2zM468 79l-1 -3h2zM280 7v-2l3 2zM294 11v2l-2 -2zM73 116l5 -6 1 2 -6 6v7h-6l-2 -2 2 -2 -3 -3 8 1zM288 19l3 -3 -5 -2v-6l6 1 1 4 6 -1 -1 -2 10 -10 3 4 -1 5 -5 6 -5 -1 -1 5 -5 -1 1 2 -7 5 -6 -1 4 9 -4 -2 -5 7 4 3 -10 4 -1 -8 7 -6 -2 -8 5 1z";
 
 const JapanMapView = {
   /** 都道府県一周レベルのASSET_RANKSエントリから「都道府県名」を取り出す */
@@ -107,12 +109,11 @@ const JapanMapView = {
 
     return `
       <div class="japan-map-wrap">
-        <svg class="japan-map-svg" viewBox="0 0 1000 1050" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="都道府県一周レベルの達成状況マップ">
+        <svg class="japan-map-svg" viewBox="0 0 1000 960" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="都道府県一周レベルの達成状況マップ">
           ${prefPaths}
           <g class="jmap-okinawa-inset">
-            <rect x="10" y="975" width="190" height="45" rx="6" class="jmap-inset-box" />
-            <text x="18" y="989" class="jmap-inset-label">沖縄県</text>
-            <g transform="translate(60 988) scale(2.6)">
+            <rect x="700" y="770" width="230" height="80" rx="4" class="jmap-inset-box" />
+            <g transform="translate(710 782) scale(0.43)">
               <path class="jmap-pref${okinawaCls ? " " + okinawaCls : ""}" d="${OKINAWA_INSET_PATH}"><title>沖縄県</title></path>
             </g>
           </g>
