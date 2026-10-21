@@ -24,6 +24,18 @@ const Models = {
       id: uid("user"),
       createdAt: new Date().toISOString(),
       currentSeasonId: null,
+      heightCm: null, // BMI計算用の身長（その他 > 身長設定で入力）
+    };
+  },
+
+  /** 体重記録（BPT資産のシーズンとは独立した、日毎の体重ログ） */
+  createWeightRecord(userId, date, weight) {
+    return {
+      id: uid("wgt"),
+      userId,
+      date, // "YYYY-MM-DD"
+      weight, // kg
+      createdAt: new Date().toISOString(),
     };
   },
 
