@@ -298,6 +298,35 @@ const ChartUI = {
     const toYw = (v) => padTop + (1 - (v - wMin) / wRange) * plotH;
     const toYb = (v) => padTop + (1 - (v - bMin) / bRange) * plotH;
 
+    // ---- BMIの判定ゾーン（背景の色分け帯） ----
+    // 日本肥満学会の基準（BmiCalculator.categoryと同じ区分）で、
+    // 表示範囲（bMin〜bMax）に重なる帯だけを描画する。
+    let bmiZonesHtml = "";
+    if (hasBmi) {
+      const zones = [
+        { lo: -Infinity, hi: 18.5, label: "低体重", color: "#6E8FAE" },
+        { lo: 18.5, hi: 25, label: "標準体重", color: "#8FA678" },
+        { lo: 25, hi: 30, label: "肥満（1度）", color: "#C9A15A" },
+        { lo: 30, hi: 35, label: "肥満（2度）", color: "#B5493C" },
+        { lo: 35, hi: 40, label: "肥満（3度）", color: "#9C3B2F" },
+        { lo: 40, hi: Infinity, label: "肥満（4度）", color: "#7A2E24" },
+      ];
+      bmiZonesHtml = zones.map(z => {
+        const lo = Math.max(z.lo, bMin);
+        const hi = Math.min(z.hi, bMax);
+        if (lo >= hi) return ""; // 表示範囲と重ならない帯は描かない
+        const yTop = toYb(hi);
+        const yBottom = toYb(lo);
+        const bandHeight = yBottom - yTop;
+        // 帯が薄すぎるとラベルが重なって読めないため、一定の高さがある時だけラベルを出す
+        const showLabel = bandHeight >= 16;
+        return `
+          <rect x="${padLeft}" y="${yTop.toFixed(1)}" width="${plotW.toFixed(1)}" height="${bandHeight.toFixed(1)}" fill="${z.color}" opacity="0.14" />
+          ${showLabel ? `<text x="${(width - padRight - 3).toFixed(1)}" y="${(yTop + bandHeight / 2 + 3).toFixed(1)}" text-anchor="end" font-size="7.5" font-weight="700" fill="${z.color}">${z.label}</text>` : ""}
+        `;
+      }).join("");
+    }
+
     const weightColor = "#2F6690";
     const bmiColor = "#C77B3D";
 
@@ -380,6 +409,7 @@ const ChartUI = {
 
     return `
       <svg class="weight-bmi-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+        ${bmiZonesHtml}
         ${idealLineHtml}
         <path fill="none" stroke="${weightColor}" stroke-width="2" d="${weightPath}" />
         ${hasBmi ? `<path fill="none" stroke="${bmiColor}" stroke-width="2" stroke-dasharray="1 0" d="${bmiPath}" />` : ""}

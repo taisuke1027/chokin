@@ -1826,7 +1826,7 @@ table.sim-table td.negative { color: var(--clay); }
 }
 .cal-cell {
   position: relative;
-  aspect-ratio: 0.72 / 1;
+  aspect-ratio: 0.6 / 1;
   background: var(--paper-deep);
   border: none;
   border-radius: 8px;
