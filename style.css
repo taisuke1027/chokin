@@ -115,7 +115,7 @@ button {
 
 main.view {
   flex: 1;
-  padding: 4px 20px 185px;
+  padding: 4px 20px 130px;
   animation: fadeIn 0.2s ease;
 }
 
@@ -1458,12 +1458,18 @@ table.sim-table td.negative { color: var(--clay); }
   max-width: 440px;
   z-index: 25;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
 }
 .record-cta-fixed .btn-primary,
 .record-cta-fixed .btn-secondary {
+  flex: 1;
+  width: auto;
   box-shadow: 0 6px 18px rgba(35,38,43,0.28);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 6px;
+  text-align: center;
 }
 .record-cta-fixed .btn-secondary {
   background: var(--surface);

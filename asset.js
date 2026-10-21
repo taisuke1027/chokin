@@ -366,6 +366,10 @@ const AssetView = {
     this.renderDayDetailOverlay();
   },
 
+  getDayWeight(dateKey) {
+    return Storage.getWeightRecordByDate(AppState.user.id, dateKey);
+  },
+
   getDayRecords(dateKey) {
     const seasonIds = SeasonManager.getAllSeasons(AppState.user.id).map(s => s.id);
     return Storage.getWorkoutRecords()
@@ -377,6 +381,7 @@ const AssetView = {
     this.removeDayDetailOverlay();
     const dateKey = this.detailDate;
     const records = this.getDayRecords(dateKey);
+    const weightRecord = this.getDayWeight(dateKey);
 
     const root = document.getElementById("overlayRoot");
     const overlay = el(`
@@ -397,9 +402,9 @@ const AssetView = {
           ` : ""}
 
           <div style="margin-top:10px; max-height:50vh; overflow-y:auto;">
-            ${records.length === 0
+            ${(records.length === 0 && !(weightRecord && !this.detailSelectMode))
               ? `<div class="empty-state"><div class="icon">${icon("calendar", { size: 26 })}</div><p>この日の運動記録はありません。</p></div>`
-              : records.map(r => this.renderDayDetailRow(r)).join("")}
+              : (weightRecord && !this.detailSelectMode ? this.renderDayDetailWeightRow(weightRecord) : "") + records.map(r => this.renderDayDetailRow(r)).join("")}
           </div>
 
           <div class="edit-actions">
@@ -460,7 +465,7 @@ const AssetView = {
         });
       });
 
-      overlay.querySelectorAll(".swipe-row").forEach(rowEl => {
+      overlay.querySelectorAll(".swipe-row[data-swipe-record-id]").forEach(rowEl => {
         const id = rowEl.dataset.swipeRecordId;
         const contentEl = rowEl.querySelector(".swipe-content");
         const deleteEl = rowEl.querySelector(".swipe-delete-action");
@@ -477,6 +482,26 @@ const AssetView = {
           }, { confirmLabel: "削除" });
         });
       });
+
+      const weightRowEl = overlay.querySelector(".swipe-row[data-swipe-weight-id]");
+      if (weightRowEl) {
+        const contentEl = weightRowEl.querySelector(".swipe-content");
+        const deleteEl = weightRowEl.querySelector(".swipe-delete-action");
+        contentEl.addEventListener("click", () => {
+          WeightRecordView.state.date = dateKey;
+          this.removeDayDetailOverlay();
+          Router.go("weightRecord");
+        });
+        bindSwipeToDelete(weightRowEl, contentEl, deleteEl, () => {
+          if (!weightRecord) return;
+          ConfirmDialog.show("この体重記録を削除しますか？", () => {
+            Storage.deleteWeightRecord(weightRecord.id);
+            showToast("体重記録を削除しました");
+            this.renderDayDetailOverlay();
+            Router.refresh();
+          }, { confirmLabel: "削除" });
+        });
+      }
     }
   },
 
@@ -520,6 +545,28 @@ const AssetView = {
             </div>
           </div>
           <div class="le-amt">${Fmt.signedBpt(r.calculatedBPT)}</div>
+          <div class="le-chevron">›</div>
+        </button>
+      </div>
+    `;
+  },
+
+  /** 体重の行（タップで編集＝体重記録画面をその日付で開く、左スワイプで削除） */
+  renderDayDetailWeightRow(w) {
+    const heightCm = AppState.user.heightCm;
+    const sub = heightCm ? `BMI ${BmiCalculator.calculate(w.weight, heightCm).toFixed(1)}` : "体重";
+    return `
+      <div class="swipe-row" data-swipe-weight-id="${w.id}">
+        <button class="swipe-delete-action" data-delete-weight-id="${w.id}">${icon("trash", { size: 16 })} 削除</button>
+        <button class="ledger-entry clickable swipe-content" data-weight-id="${w.id}">
+          <div class="le-left">
+            <div class="le-icon">${icon("scale", { size: 16 })}</div>
+            <div>
+              <div class="le-name">体重</div>
+              <div class="le-sub">${sub}</div>
+            </div>
+          </div>
+          <div class="le-amt">${w.weight}kg</div>
           <div class="le-chevron">›</div>
         </button>
       </div>
