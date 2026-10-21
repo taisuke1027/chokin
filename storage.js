@@ -195,6 +195,26 @@ const Storage = {
     this.saveBaselines(baselines);
   },
 
+  // ---- WeightRecords (配列。体重はBPT資産やシーズンと独立した個人の記録) ----
+  getWeightRecords() { return this._get("weightRecords", []); },
+  saveWeightRecords(list) { this._set("weightRecords", list); },
+  getWeightRecordsByUser(userId) {
+    return this.getWeightRecords().filter(r => r.userId === userId).sort((a, b) => a.date.localeCompare(b.date));
+  },
+  getWeightRecordByDate(userId, date) {
+    return this.getWeightRecords().find(r => r.userId === userId && r.date === date) || null;
+  },
+  /** 同じ日の記録があれば上書きし、なければ追加する（1日1件） */
+  upsertWeightRecord(record) {
+    const list = this.getWeightRecords();
+    const idx = list.findIndex(r => r.userId === record.userId && r.date === record.date);
+    if (idx >= 0) { record.id = list[idx].id; list[idx] = record; } else { list.push(record); }
+    this.saveWeightRecords(list);
+  },
+  deleteWeightRecord(recordId) {
+    this.saveWeightRecords(this.getWeightRecords().filter(r => r.id !== recordId));
+  },
+
   // ---- 最終減価適用日（デトレーニング計算の基準） ----
   getLastDecayDate() { return this._get("lastDecayDate", null); },
   setLastDecayDate(dateStr) { this._set("lastDecayDate", dateStr); },

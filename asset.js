@@ -66,7 +66,7 @@ const AssetView = {
           <hr class="hr-dash" style="margin:16px 0;" />
 
           <div id="calSwipeArea">
-            ${this.renderCalendarGrid(this.state.yearMonth, dailyTotals, this.computeRecordDates(this.state.yearMonth))}
+            ${this.renderCalendarGrid(this.state.yearMonth, dailyTotals, this.computeRecordDates(this.state.yearMonth), this.computeWeightsForMonth(this.state.yearMonth))}
           </div>
           <div class="cal-legend">
             <span><span class="cal-legend-dot gain"></span>増加分</span>
@@ -87,6 +87,10 @@ const AssetView = {
 
           <hr class="hr-dash" />
           ${this.renderBreakdownChart(asset, total)}
+
+          <hr class="hr-dash" />
+          <div class="section-label">体重・BMI</div>
+          ${this.renderWeightBmiSection(period)}
         </div>
 
         <h2 style="font-family:var(--font-display); font-size:19px; margin:24px 0 12px;">記録一覧</h2>
@@ -106,6 +110,32 @@ const AssetView = {
         </div>
       </div>
     `);
+  },
+
+  /** 体重・BMIの折れ線グラフ（データグラフの期間選択を共有する） */
+  renderWeightBmiSection(period) {
+    let weightList = Storage.getWeightRecordsByUser(AppState.user.id);
+    if (period.key === "season") {
+      weightList = weightList.filter(r => r.date >= AppState.season.startDate.slice(0, 10));
+    } else if (period.days) {
+      const cutoff = addDaysStr(todayStr(), -period.days);
+      weightList = weightList.filter(r => r.date >= cutoff);
+    }
+    // "all" はそのまま全件
+
+    const heightCm = AppState.user.heightCm;
+    const points = weightList.map(r => ({
+      date: r.date,
+      weight: r.weight,
+      bmi: heightCm ? BmiCalculator.calculate(r.weight, heightCm) : null,
+    }));
+    const idealWeight = heightCm ? BmiCalculator.idealWeight(heightCm) : null;
+
+    const chartHtml = ChartUI.renderWeightBmiChart(points, { height: 190, idealWeight });
+    const hint = !heightCm && points.length > 0
+      ? `<p class="small-muted" style="margin-top:8px;">身長を設定すると、BMIと標準体重の目安ラインも表示されます（その他 ＞ 身長設定）。</p>`
+      : "";
+    return chartHtml + hint;
   },
 
   // ---- 推移（旧: 資産推移ページ） ----
@@ -216,7 +246,7 @@ const AssetView = {
     return todayStr().slice(0, 7);
   },
 
-  renderCalendarGrid(yearMonth, dailyTotals, recordDates) {
+  renderCalendarGrid(yearMonth, dailyTotals, recordDates, weightByDate = {}) {
     const [y, m] = yearMonth.split("-").map(Number);
     const firstWeekday = new Date(y, m - 1, 1).getDay(); // 0=日
     const daysInMonth = new Date(y, m, 0).getDate();
@@ -249,12 +279,22 @@ const AssetView = {
               <div class="cal-day-amounts">
                 ${hasGain ? `<div class="cal-gain">+${Fmt.compactBpt(data.gain)}</div>` : ""}
                 ${hasDecay ? `<div class="cal-decay">${data.decay > 0.5 ? "-" + Fmt.compactBpt(data.decay) : "0"}</div>` : ""}
+                ${weightByDate[dateKey] ? `<div class="cal-weight">${weightByDate[dateKey]}kg</div>` : ""}
               </div>
             </button>
           `;
         }).join("")}
       </div>
     `;
+  },
+
+  /** その月の、日付→体重(kg) のマップ（BPT資産とは独立した体重記録から集計） */
+  computeWeightsForMonth(yearMonth) {
+    const map = {};
+    Storage.getWeightRecordsByUser(AppState.user.id)
+      .filter(r => r.date.startsWith(yearMonth))
+      .forEach(r => { map[r.date] = r.weight; });
+    return map;
   },
 
   computeDailyTotals(yearMonth) {

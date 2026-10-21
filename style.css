@@ -115,7 +115,7 @@ button {
 
 main.view {
   flex: 1;
-  padding: 4px 20px 130px;
+  padding: 4px 20px 185px;
   animation: fadeIn 0.2s ease;
 }
 
@@ -1275,6 +1275,29 @@ svg.stacked-chart .stack-line { fill: none; stroke-width: 1.5; }
 svg.multiline-chart { width: 100%; height: auto; overflow: visible; }
 svg.multiline-chart .gridline { stroke: var(--rule); stroke-width: 1; }
 
+svg.weight-bmi-chart { width: 100%; height: auto; overflow: visible; }
+
+/* ---- 体重記録画面: BMIプレビュー ---- */
+.weight-bmi-hint { margin-top: 2px; }
+.weight-bmi-preview {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  background: var(--paper-deep);
+  border-radius: var(--radius-m);
+}
+.weight-bmi-preview .k { font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+.weight-bmi-preview .v { font-size: 18px; font-weight: 800; color: var(--ink); }
+.weight-bmi-cat { font-size: 12px; font-weight: 700; margin-left: auto; }
+.stack-legend-dash {
+  width: 14px;
+  height: 0;
+  border-top: 2px dashed var(--ink-faint);
+  display: inline-block;
+}
+
 /* ---- プレッシャーレベル スライダー ---- */
 .pressure-slider {
   -webkit-appearance: none;
@@ -1434,7 +1457,16 @@ table.sim-table td.negative { color: var(--clay); }
   width: calc(100% - 40px);
   max-width: 440px;
   z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.record-cta-fixed .btn-primary,
+.record-cta-fixed .btn-secondary {
   box-shadow: 0 6px 18px rgba(35,38,43,0.28);
+}
+.record-cta-fixed .btn-secondary {
+  background: var(--surface);
 }
 
 .inline-accent { color: var(--brass-deep); vertical-align: -2px; }
@@ -1856,6 +1888,7 @@ table.sim-table td.negative { color: var(--clay); }
 }
 .cal-gain { font-size: 8.5px; font-weight: 700; color: #4E7EA8; line-height: 1.35; }
 .cal-decay { font-size: 8.5px; font-weight: 700; color: var(--clay); line-height: 1.35; }
+.cal-weight { font-size: 8px; font-weight: 700; color: var(--ink-faint); line-height: 1.35; }
 .cal-legend {
   display: flex;
   gap: 18px;

@@ -8,7 +8,7 @@
  * ------------------------------------------------------------------
  */
 
-const CACHE_VERSION = "chikutate-v17";
+const CACHE_VERSION = "chikutate-v18";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -28,6 +28,7 @@ const CORE_ASSETS = [
   "./decayCalculator.js",
   "./habitCalculator.js",
   "./bptCalculator.js",
+  "./bmiCalculator.js",
   "./seasonManager.js",
   "./format.js",
   "./icons.js",
@@ -51,6 +52,8 @@ const CORE_ASSETS = [
   "./science.js",
   "./gameBalanceSettings.js",
   "./more.js",
+  "./weightRecord.js",
+  "./heightSettings.js",
   "./router.js",
   "./app.js",
   "./icon-192.png",

@@ -11,6 +11,8 @@ const Router = {
     seasons: SeasonsView,
     science: ScienceView,
     gameBalance: GameBalanceSettingsView,
+    weightRecord: WeightRecordView,
+    heightSettings: HeightSettingsView,
   },
 
   init() {
@@ -36,7 +38,7 @@ const Router = {
       if (view.afterRender) view.afterRender(params);
 
       // 「その他」から遷移するサブ画面は、右スワイプで「その他」に戻れるようにする
-      const swipeBackViews = { seasons: "more", science: "more", gameBalance: "more" };
+      const swipeBackViews = { seasons: "more", science: "more", gameBalance: "more", heightSettings: "more", weightRecord: "home" };
       if (swipeBackViews[viewName]) {
         bindSwipeRightToGoBack(rendered, swipeBackViews[viewName]);
       }
@@ -51,7 +53,7 @@ const Router = {
     }
 
     // ボトムナビのハイライト（サブ画面は親タブをハイライト）
-    const navMap = { seasons: "more", science: "more" };
+    const navMap = { seasons: "more", science: "more", gameBalance: "more", heightSettings: "more", weightRecord: "home" };
     const highlightKey = navMap[viewName] || viewName;
     document.querySelectorAll("#bottomNav button").forEach(b => {
       b.classList.toggle("active", b.dataset.view === highlightKey);

@@ -139,13 +139,17 @@ const HomeView = {
           </p>
         </div>
 
-        <button class="btn-primary record-cta-fixed" id="recordCta">＋ 運動を記録する</button>
+        <div class="record-cta-fixed">
+          <button class="btn-primary" id="recordCta">＋ 運動を記録する</button>
+          <button class="btn-secondary" id="weightRecordCta">＋ 体重を記録する</button>
+        </div>
       </div>
     `);
   },
 
   afterRender() {
     document.getElementById("recordCta").addEventListener("click", () => Router.go("record"));
+    document.getElementById("weightRecordCta").addEventListener("click", () => Router.go("weightRecord"));
 
     document.getElementById("bptInfoBtn").addEventListener("click", () => {
       BptInfoView.show();
